@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.vniizht</groupId>
-    <artifactId>suburbTransform</artifactId>
+    <artifactId>SuburbTransform</artifactId>
     <version>1.0</version>
     <packaging>jar</packaging>
 
