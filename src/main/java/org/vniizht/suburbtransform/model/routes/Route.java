@@ -8,10 +8,10 @@ import lombok.experimental.SuperBuilder;
 @ToString
 @SuperBuilder(toBuilder=true)
 public class Route {
-    Short serial;
-    Short distance;
+    Integer serial;
+    Integer distance;
 
-    Route (Short distance) {
+    Route (Integer distance) {
         this.distance = distance;
     }
 }

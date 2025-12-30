@@ -1,1 +1,1 @@
-SELECT true
+SELECT ARRAY ['1', '2', '3'] as list

@@ -10,5 +10,5 @@ import lombok.experimental.SuperBuilder;
 @ToString
 @SuperBuilder(toBuilder=true)
 public class McdRoute extends Route {
-    private char code;
+    private String code;
 }

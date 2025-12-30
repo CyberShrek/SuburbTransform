@@ -18,7 +18,8 @@ public class Main {
 
         new TransformationOptions(requestDate, argsSet.contains("prig"), argsSet.contains("pass"));
 
-        System.out.println(new HandbookDao());
+        System.out.println(SimpleJdbc.queryForMatrix("demo"));
+//        System.out.println(new HandbookDao());
 
 //
 //        // Поиск даты в формате DDMMYYYYY (8 цифр) и присвоение в requestDate

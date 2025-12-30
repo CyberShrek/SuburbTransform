@@ -121,7 +121,7 @@ public class RouteGroup {
             collector = new ArrayList<>();
 
         collector.add(route);
-        route.serial = (short) collector.size();
+        route.serial = collector.size();
         return collector;
     }
 
