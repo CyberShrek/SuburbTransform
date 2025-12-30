@@ -6,6 +6,6 @@ import java.sql.SQLException;
 public class Playground {
 
     public static void main(String[] args) throws SQLException, IOException {
-        System.out.println(SimpleJdbc.queryForList("demo"));
+        System.out.println(SimpleJdbc.queryForMatrix("demo"));
     }
 }

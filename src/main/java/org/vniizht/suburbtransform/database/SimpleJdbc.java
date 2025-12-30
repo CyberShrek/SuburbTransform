@@ -3,8 +3,12 @@ package org.vniizht.suburbtransform.database;
 import org.vniizht.suburbtransform.util.Resources;
 
 import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -16,10 +20,10 @@ public class SimpleJdbc {
     }
 
     public static void query(String queryId, Map<String, Object> params) throws SQLException, IOException {
-        queryForList(queryId, params);
+        queryForMatrix(queryId, params);
     }
 
-    public static List<List<Object>> queryForList(String queryId, Map<String, Object> params) throws SQLException, IOException {
+    public static List<Map<String, Object>> queryForMatrix(String queryId, Map<String, Object> params) throws SQLException, IOException {
 
         String sql = Resources.load(getQueryPath(queryId));
         List<String> paramNames = new ArrayList<>();
@@ -35,8 +39,26 @@ public class SimpleJdbc {
             }
         }
     }
-    public static List<List<Object>> queryForList(String queryId) throws SQLException, IOException {
-        return queryForList(queryId, null);
+    public static List<Map<String, Object>> queryForMatrix(String queryId) throws SQLException, IOException {
+        return queryForMatrix(queryId, null);
+    }
+
+    public static <T> List<T> queryForObjects(String queryId, Map<String, Object> params, Class<T> clazz) throws Exception {
+        List<Map<String, Object>> rows = queryForMatrix(queryId, params);
+        List<T> objects = new ArrayList<>();
+
+        for (Map<String, Object> row : rows) {
+            T obj = clazz.newInstance();
+            for (Field field : clazz.getDeclaredFields()) {
+                field.setAccessible(true);
+                field.set(obj, row.get(field.getName()));
+            }
+            objects.add(obj);
+        }
+        return objects;
+    }
+    public static <T> List<T> queryForObjects(String queryId, Class<T> clasS) throws Exception {
+        return queryForObjects(queryId, null, clasS);
     }
 
     private static String getQueryPath(String queryId) {
@@ -78,21 +100,21 @@ public class SimpleJdbc {
         }
     }
 
-    private static List<List<Object>> resultSetToList(ResultSet rs) throws SQLException {
-        List<List<Object>> result = new ArrayList<>();
-        ResultSetMetaData metaData = rs.getMetaData();
+    private static List<Map<String, Object>> resultSetToList(ResultSet rs) throws SQLException {
+        List<Map<String, Object>> result = new ArrayList<>();
+        ResultSetMetaData metaData       = rs.getMetaData();
 
         // Заголовки столбцов
-        result.add(new ArrayList<>());
+        List<String> columnNames = new ArrayList<>();
         for (int i = 1; i <= metaData.getColumnCount(); i++) {
-            result.get(0).add(metaData.getColumnName(i));
+            columnNames.add(metaData.getColumnName(i));
         }
 
         // Строки
         while (rs.next()) {
-            List<Object> row = new ArrayList<>();
-            for (int i = 1; i <= metaData.getColumnCount(); i++) {
-                row.add(rs.getObject(i));
+            Map<String, Object> row = new HashMap<>();
+            for (int i = 0; i < metaData.getColumnCount(); i++) {
+                row.put(columnNames.get(i), rs.getObject(i + 1));
             }
             result.add(row);
         }

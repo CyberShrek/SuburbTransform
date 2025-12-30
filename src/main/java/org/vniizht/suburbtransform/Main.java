@@ -2,6 +2,8 @@ package org.vniizht.suburbtransform;
 
 import org.vniizht.suburbtransform.database.SimpleJdbc;
 import org.vniizht.suburbtransform.model.TransformationOptions;
+import org.vniizht.suburbtransform.service.handbook.Handbook;
+import org.vniizht.suburbtransform.service.handbook.HandbookDao;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -16,7 +18,8 @@ public class Main {
 
         new TransformationOptions(requestDate, argsSet.contains("prig"), argsSet.contains("pass"));
 
-        System.out.println(SimpleJdbc.queryForList("demo"));
+        System.out.println(new HandbookDao());
+
 //
 //        // Поиск даты в формате DDMMYYYYY (8 цифр) и присвоение в requestDate
 //        String ddMMyyyy = argsSet.stream().filter(arg -> arg.matches("\\d{8}")).findFirst().orElse(null);

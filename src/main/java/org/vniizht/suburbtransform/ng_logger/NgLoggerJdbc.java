@@ -26,7 +26,7 @@ public abstract class NgLoggerJdbc {
     }
 
     public static String getLastProcessId() throws SQLException, IOException {
-        return (String) SimpleJdbc.queryForList("nglog/getLastProcessId", new HashMap<String, Object>(){{
+        return (String) SimpleJdbc.queryForMatrix("nglog/findLastProcessId", new HashMap<String, Object>(){{
             put("systemName", systemName);
         }}).get(0).get(0);
     }
