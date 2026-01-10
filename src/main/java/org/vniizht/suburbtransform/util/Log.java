@@ -14,15 +14,15 @@ public class Log {
     private final NgLogger nglog = new NgLogger();
     private final StringBuilder logBuilder = new StringBuilder();
 
-    public Log() throws SQLException, IOException {
+    public Log() throws Exception {
     }
 
 
-    public void addLine(String... messages) throws SQLException, IOException {
+    public void addLine(String... messages) throws Exception {
         addLine(true, messages);
     }
 
-    private void addLine(boolean withNG, String... messages) throws SQLException, IOException {
+    private void addLine(boolean withNG, String... messages) throws Exception {
         for (String line : messages) {
             System.out.println(line);
             if (withNG) nglog.writeInfo(line);
@@ -32,19 +32,19 @@ public class Log {
         }
     }
 
-    public void addTimeLine(String... messages) throws SQLException, IOException {
+    public void addTimeLine(String... messages) throws Exception {
         for (String line : messages) {
             addLine(false, new SimpleDateFormat("HH:mm:ss\t").format(new Date()) + line);
             nglog.writeInfo(line);
         }
     }
 
-    public String sumUp() throws SQLException, IOException {
+    public String sumUp() throws Exception {
         addLine(false, "-------------------------------------\n");
         return logBuilder.toString();
     }
 
-    public String sumUp(String... finalMessages) throws SQLException, IOException {
+    public String sumUp(String... finalMessages) throws Exception {
         addLine(false, "-------------------------------------");
         for (String message : finalMessages) {
             addLine(message);
@@ -54,7 +54,7 @@ public class Log {
                 .toString();
     }
 
-    public void error(String message) throws SQLException, IOException {
+    public void error(String message) throws Exception {
         nglog.writeError(message);
         sumUp(message);
     }
@@ -64,7 +64,7 @@ public class Log {
                 .toString();
     }
 
-    public void finish(String... finalMessages) throws SQLException, IOException {
+    public void finish(String... finalMessages) throws Exception {
         sumUp(finalMessages);
         nglog.initProcessEnd();
     }

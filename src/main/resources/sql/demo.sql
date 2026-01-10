@@ -1,1 +1,1 @@
-SELECT ARRAY ['1', '2', '3'] as list
+SELECT ARRAY [true, false, true] as list

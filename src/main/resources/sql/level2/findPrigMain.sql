@@ -28,11 +28,6 @@ SELECT
     abonement_subtype,
     carryon_type,
     carryon_weight,
-    flg_2wayticket,
-    flg_child,
-    flg_bsp,
-    flg_carryon,
-    flg_fee_onboard,
     seatstick_limit,
     carriage_class,
     benefit_region,
@@ -51,4 +46,5 @@ SELECT
 
 
 FROM zzz_rawdl2.l2_prig_main
-WHERE idnum = ANY ${idnums}
+WHERE request_date = ${requestDate}
+ORDER BY idnum

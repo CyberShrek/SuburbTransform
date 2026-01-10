@@ -2,8 +2,6 @@ package org.vniizht.suburbtransform;
 
 import org.vniizht.suburbtransform.database.SimpleJdbc;
 import org.vniizht.suburbtransform.model.TransformationOptions;
-import org.vniizht.suburbtransform.service.handbook.Handbook;
-import org.vniizht.suburbtransform.service.handbook.HandbookDao;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -18,7 +16,6 @@ public class Main {
 
         new TransformationOptions(requestDate, argsSet.contains("prig"), argsSet.contains("pass"));
 
-        System.out.println(SimpleJdbc.queryForMatrix("demo"));
 //        System.out.println(new HandbookDao());
 
 //

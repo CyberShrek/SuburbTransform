@@ -15,6 +15,4 @@ public class CO22Meta {
     public Date operation_date;
     public Date ticket_begdate;
     public Date ticket_enddate;
-
-    public CO22Meta() {}
 }

@@ -12,26 +12,26 @@ import java.util.HashMap;
  * <p>
  * Пишет логи в nglog.log
  */
-public abstract class NgLoggerJdbc {
+public class NgLoggerDao { private NgLoggerDao() {}
 
     private final static String systemName = "SuburbL3";
     private final static String processName = "transformation";
 
-    public static void addProcess() throws IOException, SQLException {
+    public static void addProcess() throws Exception {
         SimpleJdbc.query("nglog/addProcess", new HashMap<String, Object>(){{
             put("systemName", systemName);
             put("processName", processName);
             put("hostAddress", Inet4Address.getLocalHost().getHostName());
-        }});
+        }}).close();
     }
 
-    public static String getLastProcessId() throws SQLException, IOException {
+    public static String getLastProcessId() throws Exception {
         return (String) SimpleJdbc.queryForMatrix("nglog/findLastProcessId", new HashMap<String, Object>(){{
             put("systemName", systemName);
         }}).get(0).get(0);
     }
 
-    public static void insertLog(NgLog log, String processId, int errorCode) throws IOException, SQLException {
+    public static void insertLog(NgLog log, String processId, int errorCode) throws Exception {
         SimpleJdbc.query("nglog/insertLog", new HashMap<String, Object>(){{
             put("messageCode", log.getMessageCode());
             put("errorCode", errorCode);
@@ -40,14 +40,14 @@ public abstract class NgLoggerJdbc {
             put("systemName", systemName);
             put("processName", processName);
             put("processId", processId);
-        }});
+        }}).close();
     }
 
-    public static void endProcess(String processId, boolean wasError) throws SQLException, IOException {
+    public static void endProcess(String processId, boolean wasError) throws Exception {
         String statusR = (wasError) ? "E" : "O";
         SimpleJdbc.query("nglog/endProcess", new HashMap<String, Object>(){{
             put("statusR", statusR);
             put("processId", processId);
-        }});
+        }}).close();
     }
 }

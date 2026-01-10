@@ -1,4 +1,4 @@
-package org.vniizht.suburbtransform.service.handbook;
+package org.vniizht.suburbtransform.service.dao;
 
 import lombok.ToString;
 import org.vniizht.suburbtransform.database.SimpleJdbc;

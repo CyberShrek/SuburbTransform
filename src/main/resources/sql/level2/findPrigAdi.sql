@@ -15,3 +15,4 @@ SELECT
 
 FROM zzz_rawdl2.l2_prig_adi
 WHERE idnum = ANY ${idnums}
+ORDER BY idnum

@@ -2,10 +2,7 @@ package org.vniizht.suburbtransform.database;
 
 import org.vniizht.suburbtransform.util.Resources;
 
-import java.io.IOException;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,50 +12,44 @@ import java.util.regex.Pattern;
 
 public class SimpleJdbc {
 
-    public static boolean isQueryExists(String queryId) {
-        return Resources.exists(getQueryPath(queryId));
-    }
-
-    public static void query(String queryId, Map<String, Object> params) throws SQLException, IOException {
-        queryForMatrix(queryId, params);
-    }
-
-    public static List<Map<String, Object>> queryForMatrix(String queryId, Map<String, Object> params) throws SQLException, IOException {
-
-        String sql = Resources.load(getQueryPath(queryId));
-        List<String> paramNames = new ArrayList<>();
-        String preparedSql = replaceParams(sql, paramNames);
-
-        try (Connection connection = ConnectionPool.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(preparedSql)) {
-            if (params != null)
-                setParams(stmt, paramNames, params);
-
-            try (ResultSet rs = stmt.executeQuery()) {
-                return resultSetToList(rs);
-            }
-        }
-    }
-    public static List<Map<String, Object>> queryForMatrix(String queryId) throws SQLException, IOException {
+    public static List<Map<String, Object>> queryForMatrix(String queryId) throws Exception {
         return queryForMatrix(queryId, null);
     }
+    public static List<Map<String, Object>> queryForMatrix(String queryId, Map<String, Object> params) throws Exception {
+        return resultSetToMatrix(query(queryId, params));
+    }
 
-    public static <T> List<T> queryForObjects(String queryId, Map<String, Object> params, Class<T> clazz) throws Exception {
+    public static <T> List<T> queryForObjects(String queryId, Class<T> clasS) throws Exception {
+        return queryForObjects(queryId, null, clasS);
+    }
+    public static <T> List<T> queryForObjects(String queryId, Map<String, Object> params, Class<T> clasS) throws Exception {
         List<Map<String, Object>> rows = queryForMatrix(queryId, params);
         List<T> objects = new ArrayList<>();
 
         for (Map<String, Object> row : rows) {
-            T obj = clazz.newInstance();
-            for (Field field : clazz.getDeclaredFields()) {
-                field.setAccessible(true);
+            T obj = clasS.newInstance();
+            for (Field field : clasS.getFields()) {
                 field.set(obj, row.get(field.getName()));
             }
             objects.add(obj);
         }
         return objects;
     }
-    public static <T> List<T> queryForObjects(String queryId, Class<T> clasS) throws Exception {
-        return queryForObjects(queryId, null, clasS);
+
+    public static ResultSet query(String queryId, Map<String, Object> params) throws Exception {
+        String sql = Resources.load(getQueryPath(queryId));
+        List<String> paramNames = new ArrayList<>();
+        String preparedSql = replaceParams(sql, paramNames);
+        PreparedStatement stmt = ConnectionPool.getConnection().prepareStatement(preparedSql);
+        if (params != null)
+            setParams(stmt, paramNames, params);
+
+        System.out.print(new java.util.Date());
+        System.out.println(" Exequte query");
+        ResultSet rs = stmt.executeQuery();
+        System.out.print(new java.util.Date());
+        System.out.println(" Just got");
+        return rs;
     }
 
     private static String getQueryPath(String queryId) {
@@ -100,7 +91,7 @@ public class SimpleJdbc {
         }
     }
 
-    private static List<Map<String, Object>> resultSetToList(ResultSet rs) throws SQLException {
+    private static List<Map<String, Object>> resultSetToMatrix(ResultSet rs) throws SQLException {
         List<Map<String, Object>> result = new ArrayList<>();
         ResultSetMetaData metaData       = rs.getMetaData();
 
@@ -118,7 +109,8 @@ public class SimpleJdbc {
             }
             result.add(row);
         }
-
+        System.out.print(new java.util.Date());
+        System.out.println(" Matrix is ready. Size: " + result.size());
         return result;
     }
 }

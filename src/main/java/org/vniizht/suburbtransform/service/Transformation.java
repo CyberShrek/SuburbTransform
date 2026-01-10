@@ -1,15 +1,5 @@
 package org.vniizht.suburbtransform.service;
 
-import org.vniizht.suburbtransform.model.TransformationOptions;
-import org.vniizht.suburbtransform.service.handbook.Handbook;
-import org.vniizht.suburbtransform.util.Log;
-import org.vniizht.suburbtransform.util.Util;
-
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.stream.Collectors;
-
 public class Transformation {
 
 //    private static int PORTION_SIZE = 25000;

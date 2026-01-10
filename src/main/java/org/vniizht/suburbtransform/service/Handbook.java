@@ -1,6 +1,7 @@
-package org.vniizht.suburbtransform.service.handbook;
+package org.vniizht.suburbtransform.service;
 
 import org.vniizht.suburbtransform.model.handbook.*;
+import org.vniizht.suburbtransform.service.dao.HandbookDao;
 
 import java.util.Date;
 import java.util.Optional;
