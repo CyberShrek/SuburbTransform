@@ -7,8 +7,10 @@ import java.util.Date;
 
 @ToString
 @SuperBuilder
-public class Lgot extends L3Key {
+public class Lgot {
 
+    public Date request_date;
+    public Integer yyyymm;
     public String list;
     public Integer p1;
     public String p2;

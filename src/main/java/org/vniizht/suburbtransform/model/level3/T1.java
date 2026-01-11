@@ -1,15 +1,19 @@
 package org.vniizht.suburbtransform.model.level3;
 
 
+import lombok.Builder;
 import lombok.ToString;
-import lombok.experimental.SuperBuilder;
 import org.vniizht.suburbtransform.model.routes.McdRoute;
 import org.vniizht.suburbtransform.model.routes.RouteGroup;
 
-@SuperBuilder(toBuilder=true)
-@ToString
-public class T1 extends L3Key {
+import java.util.Date;
 
+@Builder(toBuilder = true)
+@ToString
+public class T1 {
+
+    public Date request_date;
+    public Integer yyyymm;
     public String p1;
     public Long p2;
     public String p3;
@@ -78,8 +82,6 @@ public class T1 extends L3Key {
     public Integer p62;
     public String p63;
 
-    public T1() {
-    }
 
     public void setRoutes(RouteGroup routeGroup) {
 

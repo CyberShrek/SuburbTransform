@@ -8,9 +8,7 @@ import org.vniizht.suburbtransform.service.dao.Level3Dao;
 import org.vniizht.suburbtransform.util.Log;
 import org.vniizht.suburbtransform.util.Util;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -134,55 +132,55 @@ public class Transformation { private Transformation() {}
             log.sumUp("Нет данных для формирования ЦО-22.");
             return;
         }
-        Set<Level3.CO22> co22Set = new HashSet<>(nullableLevel3.getCo22Result().values());
+        List<Level3.CO22> co22List = new ArrayList<>(nullableLevel3.getCo22Result().values());
 
-        log.sumUp("Сформировано записей ЦО-22:      " + co22Set.size(),
+        log.sumUp("Сформировано записей ЦО-22:      " + co22List.size(),
                 "Сформировано записей Льготников: " + nullableLevel3.getLgotResult().size());
 
-        update(co22Set, nullableLevel3.getLgotResult());
+        update(co22List, nullableLevel3.getLgotResult());
     }
 
-    private static void update(Set<Level3.CO22> co22Set, Set<Lgot> lgotSet) {
+    private static void update(List<Level3.CO22> co22List, List<Lgot> lgotList) {
         log.sumUp("\tЗатрачено времени на запись: " + Util.measureTime(() -> {
 
-            Set<T1> t1Set = co22Set.stream().map(Level3.CO22::getT1).collect(Collectors.toSet());
-            if (!t1Set.isEmpty()) {
-                log.nextTimeLine("Записываю T1 (" + t1Set.size() + ")...");
-                Level3Dao.saveT1s(t1Set);
+            List<T1> t1List = co22List.stream().map(Level3.CO22::getT1).collect(Collectors.toList());
+            if (!t1List.isEmpty()) {
+                log.nextTimeLine("Записываю T1 (" + t1List.size() + ")...");
+                Level3Dao.saveT1s(t1List, log);
             }
-            Set<T2> t2Set = new HashSet<>();
-            co22Set.forEach(co22 -> t2Set.addAll(co22.getT2()));
-            if (!t2Set.isEmpty()) {
-                log.nextTimeLine("Записываю T2 (" + t2Set.size() + ")...");
-                Level3Dao.saveT2s(t2Set);
+            List<T2> t2List = new ArrayList<>();
+            co22List.forEach(co22 -> t2List.addAll(co22.getT2()));
+            if (!t2List.isEmpty()) {
+                log.nextTimeLine("Записываю T2 (" + t2List.size() + ")...");
+                Level3Dao.saveT2s(t2List, log);
             }
-            Set<T3> t3Set = new HashSet<>();
-            co22Set.forEach(co22 -> t3Set.addAll(co22.getT3()));
-            if (!t3Set.isEmpty()) {
-                log.nextTimeLine("Записываю T3 (" + t3Set.size() + ")...");
-                Level3Dao.saveT3s(t3Set);
+            List<T3> t3List = new ArrayList<>();
+            co22List.forEach(co22 -> t3List.addAll(co22.getT3()));
+            if (!t3List.isEmpty()) {
+                log.nextTimeLine("Записываю T3 (" + t3List.size() + ")...");
+                Level3Dao.saveT3s(t3List, log);
             }
-            Set<T4> t4Set = new HashSet<>();
-            co22Set.forEach(co22 -> t4Set.addAll(co22.getT4()));
-            if (!t4Set.isEmpty()) {
-                log.nextTimeLine("Записываю T4 (" + t4Set.size() + ")...");
-                Level3Dao.saveT4s(t4Set);
+            List<T4> t4List = new ArrayList<>();
+            co22List.forEach(co22 -> t4List.addAll(co22.getT4()));
+            if (!t4List.isEmpty()) {
+                log.nextTimeLine("Записываю T4 (" + t4List.size() + ")...");
+                Level3Dao.saveT4s(t4List, log);
             }
-            Set<T6> t6Set = new HashSet<>();
-            co22Set.forEach(co22 -> t6Set.addAll(co22.getT6()));
-            if (!t6Set.isEmpty()) {
-                log.nextTimeLine("Записываю T6 (" + t6Set.size() + ")...");
-                Level3Dao.saveT6s(t6Set);
+            List<T6> t6List = new ArrayList<>();
+            co22List.forEach(co22 -> t6List.addAll(co22.getT6()));
+            if (!t6List.isEmpty()) {
+                log.nextTimeLine("Записываю T6 (" + t6List.size() + ")...");
+                Level3Dao.saveT6s(t6List, log);
             }
-            Set<CO22Meta> co22MetaSet = new HashSet<>();
-            co22Set.forEach(co22 -> co22MetaSet.addAll(co22.getMetas()));
-            if (!co22MetaSet.isEmpty()) {
-                log.nextTimeLine("Записываю метаданные ЦО-22 (" + co22MetaSet.size() + ")...");
-                Level3Dao.saveCO22Metas(co22MetaSet);
+            List<CO22Meta> co22MetaList = new ArrayList<>();
+            co22List.forEach(co22 -> co22MetaList.addAll(co22.getMetas()));
+            if (!co22MetaList.isEmpty()) {
+                log.nextTimeLine("Записываю метаданные ЦО-22 (" + co22MetaList.size() + ")...");
+                Level3Dao.saveCO22Metas(co22MetaList, log);
             }
-            if (!lgotSet.isEmpty()) {
-                log.nextTimeLine("Записываю льготников (" + lgotSet.size() + ")...");
-                Level3Dao.saveLgots(lgotSet);
+            if (!lgotList.isEmpty()) {
+                log.nextTimeLine("Записываю льготников (" + lgotList.size() + ")...");
+                Level3Dao.saveLgots(lgotList, log);
             }
         }) + "c");
     }

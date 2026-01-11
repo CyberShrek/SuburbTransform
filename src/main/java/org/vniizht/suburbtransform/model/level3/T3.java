@@ -8,7 +8,7 @@ import java.util.Date;
 
 @SuperBuilder
 @ToString
-public class T3 extends T2T6Abstract {
+public class T3 extends T2T6 {
     public String          p5;
     public String          p6;
     public Integer           p7;

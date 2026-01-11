@@ -1,10 +1,8 @@
 package org.vniizht.suburbtransform.util;
 
+import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 public class Util {
 
@@ -74,5 +72,18 @@ public class Util {
             portions.add(prigIdnumsByRequestDate.subList(start, end));
         }
         return portions;
+    }
+
+    public static Map<String, Object> objectToMap(Object object) {
+        Map<String, Object> map = new HashMap<>();
+        for(Field field : object.getClass().getFields()) {
+            try {
+                map.put(field.getName(), field.get(object));
+            }
+            catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return map;
     }
 }

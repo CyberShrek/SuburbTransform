@@ -9,7 +9,7 @@ import java.util.Date;
 
 @SuperBuilder
 @ToString
-public class T4 extends T2T6Abstract {
+public class T4 extends T2T6 {
     public String          p5;
     public String          p6;
     public Float           p7;
