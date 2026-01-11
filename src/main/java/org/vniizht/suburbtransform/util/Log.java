@@ -2,28 +2,39 @@ package org.vniizht.suburbtransform.util;
 
 //import org.vniizht.suburbsweb.ng_logger.NgLogger;
 
+import lombok.SneakyThrows;
 import org.vniizht.suburbtransform.ng_logger.NgLogger;
 
-import java.io.IOException;
-import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Log {
 
-    private final NgLogger nglog = new NgLogger();
+    private final NgLogger nglog;
+
+    {
+        try {
+            nglog = new NgLogger();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private final StringBuilder logBuilder = new StringBuilder();
 
-    public Log() throws Exception {
+    public Log() {
     }
 
 
-    public void addLine(String... messages) throws Exception {
-        addLine(true, messages);
+    public void nextLine(String... messages) {
+        nextLine(true, messages);
     }
 
-    private void addLine(boolean withNG, String... messages) throws Exception {
-        for (String line : messages) {
+    @SneakyThrows
+    private void nextLine(boolean withNG, String... messages){
+        if (messages.length == 0)
+            System.out.println();
+        else for (String line : messages) {
             System.out.println(line);
             if (withNG) nglog.writeInfo(line);
             logBuilder
@@ -32,29 +43,36 @@ public class Log {
         }
     }
 
-    public void addTimeLine(String... messages) throws Exception {
+    @SneakyThrows
+    public void nextTimeLine(String... messages) {
         for (String line : messages) {
-            addLine(false, new SimpleDateFormat("HH:mm:ss\t").format(new Date()) + line);
+            nextLine(false, new SimpleDateFormat("HH:mm:ss\t").format(new Date()) + line);
             nglog.writeInfo(line);
         }
     }
 
-    public String sumUp() throws Exception {
-        addLine(false, "-------------------------------------\n");
+    public String sumUp() {
+        nextLine(false, "-------------------------------------\n");
         return logBuilder.toString();
     }
 
-    public String sumUp(String... finalMessages) throws Exception {
-        addLine(false, "-------------------------------------");
+    public String sumUp(String... finalMessages) {
+        nextLine(false, "-------------------------------------");
         for (String message : finalMessages) {
-            addLine(message);
+            nextLine(message);
         }
         return logBuilder
                 .append("\n")
                 .toString();
     }
 
-    public void error(String message) throws Exception {
+    public void reline(String message) {
+        System.out.print("\r");
+        System.out.print(message);
+    }
+
+    @SneakyThrows
+    public void error(String message) {
         nglog.writeError(message);
         sumUp(message);
     }
@@ -64,7 +82,8 @@ public class Log {
                 .toString();
     }
 
-    public void finish(String... finalMessages) throws Exception {
+    @SneakyThrows
+    public void finish(String... finalMessages) {
         sumUp(finalMessages);
         nglog.initProcessEnd();
     }

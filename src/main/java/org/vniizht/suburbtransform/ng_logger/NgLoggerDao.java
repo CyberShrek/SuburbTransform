@@ -1,6 +1,6 @@
 package org.vniizht.suburbtransform.ng_logger;
 
-import org.vniizht.suburbtransform.database.SimpleJdbc;
+import org.vniizht.suburbtransform.database.SimpleJdbcLogger;
 
 import java.io.IOException;
 import java.net.Inet4Address;
@@ -18,21 +18,21 @@ public class NgLoggerDao { private NgLoggerDao() {}
     private final static String processName = "transformation";
 
     public static void addProcess() throws Exception {
-        SimpleJdbc.query("nglog/addProcess", new HashMap<String, Object>(){{
+        SimpleJdbcLogger.update("nglog/addProcess", new HashMap<String, Object>(){{
             put("systemName", systemName);
             put("processName", processName);
             put("hostAddress", Inet4Address.getLocalHost().getHostName());
-        }}).close();
+        }});
     }
 
     public static String getLastProcessId() throws Exception {
-        return (String) SimpleJdbc.queryForMatrix("nglog/findLastProcessId", new HashMap<String, Object>(){{
+        return (String) SimpleJdbcLogger.queryForMatrix("nglog/findLastProcessId", new HashMap<String, Object>(){{
             put("systemName", systemName);
         }}).get(0).get(0);
     }
 
     public static void insertLog(NgLog log, String processId, int errorCode) throws Exception {
-        SimpleJdbc.query("nglog/insertLog", new HashMap<String, Object>(){{
+        SimpleJdbcLogger.update("nglog/insertLog", new HashMap<String, Object>(){{
             put("messageCode", log.getMessageCode());
             put("errorCode", errorCode);
             put("messageText", log.getMessageText().replaceAll("'", "''"));
@@ -40,14 +40,14 @@ public class NgLoggerDao { private NgLoggerDao() {}
             put("systemName", systemName);
             put("processName", processName);
             put("processId", processId);
-        }}).close();
+        }});
     }
 
     public static void endProcess(String processId, boolean wasError) throws Exception {
         String statusR = (wasError) ? "E" : "O";
-        SimpleJdbc.query("nglog/endProcess", new HashMap<String, Object>(){{
+        SimpleJdbcLogger.update("nglog/endProcess", new HashMap<String, Object>(){{
             put("statusR", statusR);
             put("processId", processId);
-        }}).close();
+        }});
     }
 }

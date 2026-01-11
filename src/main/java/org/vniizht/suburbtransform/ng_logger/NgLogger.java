@@ -1,8 +1,5 @@
 package org.vniizht.suburbtransform.ng_logger;
 
-import java.io.IOException;
-import java.sql.SQLException;
-
 /**
  * @author Alexander Ilyin
  * <p>

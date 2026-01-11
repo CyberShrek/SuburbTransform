@@ -2,19 +2,21 @@ package org.vniizht.suburbtransform.service.dao;
 
 import lombok.*;
 import org.vniizht.suburbtransform.database.SimpleJdbc;
-import org.vniizht.suburbtransform.model.level2.PrigCost;
-import org.vniizht.suburbtransform.model.level2.PrigMain;
+import org.vniizht.suburbtransform.model.level2.*;
 
-import java.sql.Date;
+import java.util.Date;
 import java.sql.ResultSet;
 import java.util.*;
-import java.util.stream.Collectors;
 
 
 public class Level2Dao { private Level2Dao() {}
 
-    public static PrigRecord loadPrigRecord(Date requestDate) {
-        return new PrigRecord(requestDate);
+    public static PrigCursor loadPrig(Date requestDate) {
+        return new PrigCursor(requestDate);
+    }
+
+    public static PassCursor loadPass(Date requestDate) {
+        return new PassCursor(requestDate);
     }
 
 //    public static Set<Record> findPassRecords(Date requestDate) {
@@ -25,49 +27,77 @@ public class Level2Dao { private Level2Dao() {}
 //    }
 
 
-    @ToString
-    static public class PrigRecord extends Record<PrigRecord> {
+    @ToString(callSuper = true)
+    static public class PrigCursor extends Cursor<PrigCursor> {
 
-        @Getter @Setter private PrigMain main;
-        @Getter @Setter private List<PrigCost> cost = new ArrayList<>();
+        @Getter @Setter private PrigMain       main;
+        @Getter @Setter private PrigAdi         adi;
+        @Getter @Setter private List<PrigCost> cost;
 
-        private ResultSet costRS;
-
-        PrigRecord(Date requestDate) {
+        @SneakyThrows
+        PrigCursor(Date requestDate) {
             super("level2/findPrigMain", requestDate);
+            loadChildRS("adi", "level2/findPrigAdi");
+            loadChildRS("cost", "level2/findPrigCost");
         }
 
+        @SneakyThrows
         @Override
-        public PrigRecord next() {
+        public PrigCursor next() {
+            super.next();
+            main = collectMain(PrigMain.class);
+            adi  = collectOne("adi", PrigAdi.class);
+            cost = collectList("cost", PrigCost.class);
             return this;
         }
     }
 
-//    @Getter
-//    @Setter
-//    @ToString
-//    static public class PassRecord extends Record {
-//        private PassMain main;
-//
-//        PassRecord(PassMain main) {
-//            super(main.idnum);
-//            this.main = main;
-//        }
-//    }
+    @ToString(callSuper = true)
+    static public class PassCursor extends Cursor<PassCursor> {
 
-    static public abstract class Record<T extends Record<T>> implements Iterator<T> {
-
-        protected final ResultSet mainRS;
-        protected final List<Long> idnums = new ArrayList<>();
+        @Getter @Setter private PassMain       main;
+        @Getter @Setter private PassMainUpd     upd;
+        @Getter @Setter private List<PassEx>     ex;
+        @Getter @Setter private PassRefund   refund;
+        @Getter @Setter private List<PassCost> cost;
 
         @SneakyThrows
-        Record(String queryId, Date requestDate) {
+        PassCursor(Date requestDate) {
+            super("level2/findPassMain", requestDate);
+            loadChildRS("upd", "level2/findPassMainUpd");
+            loadChildRS("ex", "level2/findPassEx");
+            loadChildRS("refund", "level2/findPassRefund");
+            loadChildRS("cost", "level2/findPassCost");
+        }
+
+        @SneakyThrows
+        @Override
+        public PassCursor next() {
+            super.next();
+            main    = collectMain(PassMain.class);
+            upd     = collectOne("upd", PassMainUpd.class);
+            ex      = collectList("ex", PassEx.class);
+            refund  = collectOne("refund", PassRefund.class);
+            cost    = collectList("cost", PassCost.class);
+            return this;
+        }
+    }
+
+    @ToString
+    static public abstract class Cursor<T extends Cursor<T>> implements Iterator<T> {
+
+        private final ResultSet mainRS;
+        private final Map<String, ResultSet> childrenRS = new HashMap<>();
+        private final List<Long> idnums = new ArrayList<>();
+        private Long currentIdnum;
+
+        @SneakyThrows
+        Cursor(String queryId, Date requestDate) {
             this.mainRS = SimpleJdbc.query(queryId, new HashMap(){{
                 put("requestDate", requestDate);
             }});
+            while (mainRS.next()) idnums.add(mainRS.getLong("idnum"));
             mainRS.beforeFirst();
-            while (mainRS.next())
-                idnums.add(mainRS.getLong("idnum"));
         }
 
         @Override
@@ -78,16 +108,49 @@ public class Level2Dao { private Level2Dao() {}
             return hasNext;
         }
 
-//        @Override
-//        public T next() {
-//            return this;
-//        }
-    }
+        @Override
+        @SneakyThrows
+        public T next() {
+            mainRS.next();
+            currentIdnum = mainRS.getLong("idnum");
+            return (T) this;
+        }
 
+        public int size() {
+            return idnums.size();
+        }
 
-    private static List<Long> findIdnumsByRequestDate(String queryId, Date requestDate) throws Exception {
-        return (List<Long>) SimpleJdbc.queryForMatrix(queryId, new HashMap(){{
-            put("requestDate", requestDate);
-        }}).stream().map( entry -> ((Map<String, Object>) entry).get("idnum")).collect(Collectors.toList());
+        @SneakyThrows
+        protected void loadChildRS(String key, String queryId) {
+            childrenRS.put(key, SimpleJdbc.query(queryId, new HashMap(){{
+                put("idnums", idnums);
+            }}));
+        }
+
+        @SneakyThrows
+        protected <V> V collectMain(Class<V> clasS) {
+            return SimpleJdbc.rsToObject(mainRS, clasS);
+        }
+
+        protected <V> V collectOne(String rsKey, Class<V> clasS) {
+            List<V> list = collectList(rsKey, clasS);
+            return list.isEmpty() ? null : list.get(0);
+        }
+
+        @SneakyThrows
+        protected <V> List<V> collectList(String rsKey, Class<V> clasS) {
+            ResultSet rs = childrenRS.get(rsKey);
+            List<V> result = new ArrayList<>();
+            while (rs.next()) {
+                Long idnum = rs.getLong("idnum");
+                if (idnum.equals(currentIdnum))
+                    result.add(SimpleJdbc.rsToObject(rs, clasS));
+                else if (idnum > currentIdnum) {
+                    rs.previous();
+                    break;
+                }
+            }
+            return result;
+        }
     }
 }

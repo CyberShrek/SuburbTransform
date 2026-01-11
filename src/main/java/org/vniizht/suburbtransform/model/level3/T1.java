@@ -6,7 +6,7 @@ import lombok.experimental.SuperBuilder;
 import org.vniizht.suburbtransform.model.routes.McdRoute;
 import org.vniizht.suburbtransform.model.routes.RouteGroup;
 
-@SuperBuilder
+@SuperBuilder(toBuilder=true)
 @ToString
 public class T1 extends L3Key {
 
@@ -45,23 +45,23 @@ public class T1 extends L3Key {
 
     // VALUES
     public Long p33;
-    public Float p34;
-    public Float p35;
-    public Float p36;
-    public Float p37;
-    public Float p38;
-    public Float p39;
-    public Float p40;
-    public Float p41;
-    public Float p42;
-    public Float p43;
-    public Float p44;
-    public Float p45;
-    public Float p46;
-    public Float p47;
-    public Float p48;
-    public Float p49;
-    public Float p50;
+    public Double p34;
+    public Double p35;
+    public Double p36;
+    public Double p37;
+    public Double p38;
+    public Double p39;
+    public Double p40;
+    public Double p41;
+    public Double p42;
+    public Double p43;
+    public Double p44;
+    public Double p45;
+    public Double p46;
+    public Double p47;
+    public Double p48;
+    public Double p49;
+    public Double p50;
     public Long p51;
     // VALUES
 
@@ -128,5 +128,54 @@ public class T1 extends L3Key {
         p49 += t1.p49;
         p50 += t1.p50;
         p51 += t1.p51;
+    }
+
+    public String getKey() {
+        StringBuilder keyBuilder = new StringBuilder();
+        keyBuilder.append(p1);
+        keyBuilder.append(p2);
+        keyBuilder.append(p3);
+        keyBuilder.append(p4);
+        keyBuilder.append(p5);
+        keyBuilder.append(p6);
+        keyBuilder.append(p7);
+        keyBuilder.append(p8);
+        keyBuilder.append(p9);
+        keyBuilder.append(p10);
+        keyBuilder.append(p11);
+        keyBuilder.append(p12);
+        keyBuilder.append(p13);
+        keyBuilder.append(p14);
+        keyBuilder.append(p15);
+        keyBuilder.append(p16);
+        keyBuilder.append(p17);
+        keyBuilder.append(p18);
+        keyBuilder.append(p19);
+        keyBuilder.append(p20);
+        keyBuilder.append(p21);
+        keyBuilder.append(p22);
+        keyBuilder.append(p23);
+        keyBuilder.append(p24);
+        keyBuilder.append(p25);
+        keyBuilder.append(p26);
+        keyBuilder.append(p27);
+        keyBuilder.append(p28);
+        keyBuilder.append(p29);
+        keyBuilder.append(p30);
+        keyBuilder.append(p31);
+        keyBuilder.append(p32);
+        keyBuilder.append(p52);
+        keyBuilder.append(p53);
+        keyBuilder.append(p54);
+        keyBuilder.append(p55);
+        keyBuilder.append(p56);
+        keyBuilder.append(p57);
+        keyBuilder.append(p58);
+        keyBuilder.append(p59);
+        keyBuilder.append(p60);
+        keyBuilder.append(p61);
+        keyBuilder.append(p62);
+        keyBuilder.append(p63);
+        return keyBuilder.toString();
     }
 }

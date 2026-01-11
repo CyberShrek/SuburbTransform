@@ -21,10 +21,12 @@ abstract class ConnectionPool {
     private static final String loggerXmlDS = "LogDS";
 
     private static DataSource dataSource;
+    private static DataSource loggerDataSource;
 
     static {
         try {
-            dataSource = getXmlDataSource(primaryXmlDS);
+            dataSource       = getXmlDataSource(primaryXmlDS);
+            loggerDataSource = getXmlDataSource(loggerXmlDS);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -32,6 +34,9 @@ abstract class ConnectionPool {
 
     public static Connection getConnection() throws SQLException {
         return dataSource.getConnection();
+    }
+    public static Connection getLoggerConnection() throws SQLException {
+        return loggerDataSource.getConnection();
     }
 
     private static DataSource getXmlDataSource(String dsName) throws Exception {

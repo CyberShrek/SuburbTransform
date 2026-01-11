@@ -12,11 +12,24 @@ import java.util.regex.Pattern;
 
 public class SimpleJdbc {
 
+    private static final Connection connection;
+
+    static {
+        try {
+            connection = ConnectionPool.getConnection();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public static List<Map<String, Object>> queryForMatrix(String queryId) throws Exception {
         return queryForMatrix(queryId, null);
     }
     public static List<Map<String, Object>> queryForMatrix(String queryId, Map<String, Object> params) throws Exception {
-        return resultSetToMatrix(query(queryId, params));
+        return queryForMatrix(queryId, params, connection);
+    }
+    static List<Map<String, Object>> queryForMatrix(String queryId, Map<String, Object> params, Connection connection) throws Exception {
+        return resultSetToMatrix(query(queryId, params, connection));
     }
 
     public static <T> List<T> queryForObjects(String queryId, Class<T> clasS) throws Exception {
@@ -36,21 +49,48 @@ public class SimpleJdbc {
         return objects;
     }
 
+    public static ResultSet query(String queryId) throws Exception {
+        return query(queryId, null);
+    }
     public static ResultSet query(String queryId, Map<String, Object> params) throws Exception {
+        return query(queryId, params, connection);
+    }
+    static ResultSet query(String queryId, Map<String, Object> params, Connection connection) throws Exception {
+        return prepareStatement(queryId, params, connection)
+                .executeQuery();
+    }
+
+    public static void update(String queryId, Map<String, Object> params) throws Exception {
+        update(queryId, params, connection);
+    }
+    static void update(String queryId, Map<String, Object> params, Connection connection) throws Exception {
+        prepareStatement(queryId, params, connection)
+                .executeUpdate();
+    }
+
+    private static PreparedStatement prepareStatement(String queryId, Map<String, Object> params, Connection connection) throws Exception {
         String sql = Resources.load(getQueryPath(queryId));
         List<String> paramNames = new ArrayList<>();
-        String preparedSql = replaceParams(sql, paramNames);
-        PreparedStatement stmt = ConnectionPool.getConnection().prepareStatement(preparedSql);
+        PreparedStatement statement = connection.prepareStatement(
+                replaceParams(sql, paramNames),
+                ResultSet.TYPE_SCROLL_INSENSITIVE,
+                ResultSet.CONCUR_READ_ONLY
+        );
         if (params != null)
-            setParams(stmt, paramNames, params);
+            setParams(statement, paramNames, params);
 
-        System.out.print(new java.util.Date());
-        System.out.println(" Exequte query");
-        ResultSet rs = stmt.executeQuery();
-        System.out.print(new java.util.Date());
-        System.out.println(" Just got");
-        return rs;
+        return statement;
     }
+
+    public static <T> T rsToObject(ResultSet rs, Class<T> clasS) throws Exception {
+        T obj = clasS.newInstance();
+        for (Field field : clasS.getFields()) {
+            field.set(obj, rs.getObject(field.getName()));
+        }
+        return obj;
+    }
+
+
 
     private static String getQueryPath(String queryId) {
         return "sql/" + queryId + ".sql";
@@ -71,7 +111,7 @@ public class SimpleJdbc {
         return result.toString();
     }
 
-    private static void setParams(PreparedStatement stmt, List<String> paramNames, Map<String, Object> params)
+    private static void setParams(PreparedStatement statement, List<String> paramNames, Map<String, Object> params)
             throws SQLException {
         for (int i = 0; i < paramNames.size(); i++) {
             String paramName = paramNames.get(i);
@@ -83,10 +123,10 @@ public class SimpleJdbc {
                 Object[] array = list.toArray();
 
                 // Создаем SQL массив с базовым типом VARCHAR
-                Array sqlArray = stmt.getConnection().createArrayOf("VARCHAR", array);
-                stmt.setArray(i + 1, sqlArray);
+                Array sqlArray = statement.getConnection().createArrayOf("VARCHAR", array);
+                statement.setArray(i + 1, sqlArray);
             } else {
-                stmt.setObject(i + 1, value);
+                statement.setObject(i + 1, value);
             }
         }
     }
@@ -109,8 +149,6 @@ public class SimpleJdbc {
             }
             result.add(row);
         }
-        System.out.print(new java.util.Date());
-        System.out.println(" Matrix is ready. Size: " + result.size());
         return result;
     }
 }
