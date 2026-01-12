@@ -71,11 +71,11 @@ public class HandbookDao { private HandbookDao () {}
         return plagn == null ? "  " : plagn.vr;
     }
 
-    public static String getGvc(String benefitGroupCode, String benefitCode, Date date){
-        Sublx sublx = cache.findSublx(benefitGroupCode + benefitCode, date);
+    public static String getGvc(String benefitCode, Date date){
+        Sublx sublx = cache.findSublx(benefitCode, date);
         if (sublx == null || sublx.code_lg_gvc == null) {
             return null;
         }
-        return String.valueOf(sublx.code_lg_gvc);
+        return sublx.code_lg_gvc;
     }
 }

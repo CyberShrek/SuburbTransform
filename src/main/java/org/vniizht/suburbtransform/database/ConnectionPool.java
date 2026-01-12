@@ -10,21 +10,31 @@ import javax.sql.DataSource;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.SQLException;
 
 abstract class ConnectionPool {
 
-//    private static final String xmlConfigLocation = "/opt/read/datab/DEFAULTX.XML";
-    private static final String xmlConfigLocation = "C:\\Users\\illyc\\Desktop\\Programming\\Projects\\SuburbTransform\\DEFAULTX.XML";
+    private static final String mainXmlConfigLocation = "/opt/read/datab/DEFAULTX.XML";
+    private static final String spareXmlConfigLocation = "DEFAULTX.XML";
     private static final String primaryXmlDS = "NGDS";
     private static final String loggerXmlDS = "LogDS";
 
     private static DataSource dataSource;
     private static DataSource loggerDataSource;
+    private static File xmlConfigFile;
 
     static {
         try {
+            if (Files.exists(Paths.get(mainXmlConfigLocation))) {
+                xmlConfigFile = new File(mainXmlConfigLocation);
+            } else {
+                System.out.println("Конфигурация не найдена: " + mainXmlConfigLocation);
+                System.out.println("Использую " + spareXmlConfigLocation);
+                xmlConfigFile = new File(spareXmlConfigLocation);
+            }
             dataSource       = getXmlDataSource(primaryXmlDS);
             loggerDataSource = getXmlDataSource(loggerXmlDS);
         } catch (Exception e) {
@@ -41,10 +51,9 @@ abstract class ConnectionPool {
 
     private static DataSource getXmlDataSource(String dsName) throws Exception {
 
-        File xmlFile = new File(xmlConfigLocation);
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
-        Document doc = builder.parse(xmlFile);
+        Document doc = builder.parse(xmlConfigFile);
         doc.getDocumentElement().normalize();
 
         NodeList tasks = doc.getElementsByTagName("task");
@@ -54,7 +63,7 @@ abstract class ConnectionPool {
                 return getHikariDataSource(task);
             }
         }
-        throw new IllegalArgumentException("Database database '" + dsName + "' not found in XML");
+        throw new IllegalArgumentException("БД '" + dsName + "' не найдена в XML");
     }
 
     private static DataSource getHikariDataSource(Element task) {

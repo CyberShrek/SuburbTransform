@@ -249,11 +249,9 @@ public final class Level3Pass extends Level3 <Level2Dao.PassCursor> {
     }
 
     private String getT1P26() {
-        return lgot == null || lgot.benefit_prigcode == null || lgot.benefit_prigcode.length() < 2 ? null
+        return lgot == null || lgot.benefit_prigcode == null || lgot.benefit_prigcode.isEmpty() ? null
                 :
-                HandbookDao.getGvc(
-                        lgot.benefit_prigcode.substring(0, 2),
-                        main.benefit_code, operationDate);
+                HandbookDao.getGvc(lgot.benefit_prigcode, operationDate);
     }
 
     private Double getT1P39() {

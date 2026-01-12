@@ -83,7 +83,7 @@ public final class Level3Prig extends Level3 <Level2Dao.PrigCursor> {
                 .p23("3")
                 .p24(Optional.ofNullable(fullBenefit).orElse("0000"))
                 .p25(getT1P25())
-                .p26(HandbookDao.getGvc(main.benefitgroup_code, main.benefit_code, main.operation_date))
+                .p26(HandbookDao.getGvc(main.benefitgroup_code + main.benefit_code, main.operation_date))
                 .p30(HandbookDao.getOkatoByStation(main.arrival_station, main.operation_date))
                 .p31(HandbookDao.getArea(main.arrival_station, main.operation_date))
                 .p32(costList.stream().mapToInt(costItem -> costItem.route_distance).sum())
