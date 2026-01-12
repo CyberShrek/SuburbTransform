@@ -53,7 +53,7 @@ abstract public class Level3 <L2_CURSOR extends Level2Dao.Cursor> {
     public void runTransformation(L2_CURSOR cursor, Log log) {
         int progress = 1;
         while (cursor.hasNext()) {
-            log.reline("Трансформирую... " + progress++ + " из " + cursor.size());
+            log.reline(progress++ + " из " + cursor.size());
             transform((L2_CURSOR) cursor.next());
         }
         log.nextLine();
@@ -131,7 +131,7 @@ abstract public class Level3 <L2_CURSOR extends Level2Dao.Cursor> {
             t3.forEach(t -> t.p3 = t1Serial);
             t4.forEach(t -> t.p3 = t1Serial);
             t6.forEach(t -> t.p3 = t1Serial);
-            metas.forEach(t -> t.id = t1Serial);
+            metas.forEach(t -> t.t1_id = t1Serial);
             t1Serial++;
         }
 

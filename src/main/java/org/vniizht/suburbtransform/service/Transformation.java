@@ -9,14 +9,17 @@ import org.vniizht.suburbtransform.util.Log;
 import org.vniizht.suburbtransform.util.Util;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class Transformation { private Transformation() {}
 
+    private static int PORTION_SIZE = 10000;
+
     private static final Log log = new Log();
 
-    public static synchronized void transformOrNull(TransformationOptions options) throws Exception {
+    public static synchronized void run(TransformationOptions options) {
 
         Date startTime = new Date();
         try {
@@ -75,6 +78,7 @@ public class Transformation { private Transformation() {}
                 log.nextTimeLine("Выполняю трансформацию l2_pass...");
                 complete(transformPassOrNull(options.date));
             }
+            Level3Dao.commit();
             log.nextTimeLine("Конец выполнения.");
         } catch (Exception e) {
             log.error(e.getLocalizedMessage() == null ? "" : e.getLocalizedMessage());
@@ -87,7 +91,8 @@ public class Transformation { private Transformation() {}
     private static Level3Prig transformPrigOrNull(Date requestDate) {
         return (Level3Prig) transformOrNull(
                 "l2_prig",
-                () -> Level2Dao.loadPrig(requestDate),
+                () -> Level2Dao.findPrigIdnums(requestDate),
+                Level2Dao::loadPrig,
                 new Level3Prig(Level3Dao.getLatestT1P2() + 1)
         );
     }
@@ -95,23 +100,26 @@ public class Transformation { private Transformation() {}
     private static Level3Pass transformPassOrNull(Date requestDate) {
         return (Level3Pass) transformOrNull(
                 "l2_prig",
-                () -> Level2Dao.loadPass(requestDate),
+                () -> Level2Dao.findPassIdnums(requestDate),
+                Level2Dao::loadPass,
                 new Level3Pass(Level3Dao.getLatestT1P2() + 1)
         );
     }
 
     private static Level3 transformOrNull(String name,
-                                   Supplier<Level2Dao.Cursor> cursorLoader,
-                                   Level3 level3
-                                   ) {
-        log.nextTimeLine("Загружаю записи " + name + "...");
-        Level2Dao.Cursor cursor = cursorLoader.get();
-        log.nextTimeLine("Загружено записей main: " + cursor.size());
-
-        if (cursor.size() == 0) return null;
-
-        level3.runTransformation(cursor, log);
-
+                                          Supplier<List<Long>> idnumsLoader,
+                                          Function<List<Long>, Level2Dao.Cursor> cursorLoader,
+                                          Level3 level3) {
+        log.nextTimeLine("Ищу записи " + name + "...");
+        List<Long> idnums = idnumsLoader.get();
+        log.nextTimeLine("Найдено записей main: " + idnums.size());
+        if (idnums.size() == 0) return null;
+        List<List<Long>> pagedIdnums = Util.splitList(idnums, PORTION_SIZE);
+        for (int i = 0; i < pagedIdnums.size(); i++) {
+            List<Long> currentIdnums = pagedIdnums.get(i);
+            log.nextTimeLine("Трансформирую порцию " + (i * PORTION_SIZE) + " - " + (i * PORTION_SIZE + currentIdnums.size()));
+            level3.runTransformation(cursorLoader.apply(currentIdnums), log);;
+        }
         log.nextTimeLine("Записи " + name + " успешно трансформированы.");
 
         return level3;
@@ -134,7 +142,7 @@ public class Transformation { private Transformation() {}
         }
         List<Level3.CO22> co22List = new ArrayList<>(nullableLevel3.getCo22Result().values());
 
-        log.sumUp("Сформировано записей ЦО-22:      " + co22List.size(),
+        log.sumUp("Сформировано записей ЦО-22 Т1:      " + co22List.size(),
                 "Сформировано записей Льготников: " + nullableLevel3.getLgotResult().size());
 
         update(co22List, nullableLevel3.getLgotResult());
@@ -176,7 +184,7 @@ public class Transformation { private Transformation() {}
             co22List.forEach(co22 -> co22MetaList.addAll(co22.getMetas()));
             if (!co22MetaList.isEmpty()) {
                 log.nextTimeLine("Записываю метаданные ЦО-22 (" + co22MetaList.size() + ")...");
-                Level3Dao.saveCO22Metas(co22MetaList, log);
+                Level3Dao.saveMetas(co22MetaList, log);
             }
             if (!lgotList.isEmpty()) {
                 log.nextTimeLine("Записываю льготников (" + lgotList.size() + ")...");

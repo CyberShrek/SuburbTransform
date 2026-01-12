@@ -1,5 +1,6 @@
 package org.vniizht.suburbtransform.service;
 
+import lombok.SneakyThrows;
 import org.vniizht.suburbtransform.model.level2.PrigAdi;
 import org.vniizht.suburbtransform.model.level2.PrigCost;
 import org.vniizht.suburbtransform.model.level2.PrigMain;
@@ -150,7 +151,7 @@ public final class Level3Prig extends Level3 <Level2Dao.PrigCursor> {
                 .p14(getLgotP14())
                 .p15(getLgotP15())
                 .p16(getLgotP16())
-//                .p17(main.flg_2wayticket == '1')
+                .p17(getLgotP17())
                 .p18(getLgotP18())
 
                 .p19(getLgotP20().equals("9") ? main.seatstick_limit : 0)
@@ -308,23 +309,23 @@ public final class Level3Prig extends Level3 <Level2Dao.PrigCursor> {
         }
     }
 
+    @SneakyThrows
     private String getT1P21() {
-//        if(main.flg_fee_onboard == '1') return '8'; // Квитанция за оформление в поезде
-//        if(main.flg_carryon     == '1') return '6'; // Перевозочный документ (для багажа)
-//        switch (main.abonement_type.charAt(0)) {
-//            case '5': case '6': return '4';         // Билет выходного дня
-//            case '0': return main.flg_2wayticket == '1'
-//                    ? '3'                           // В обоих направлениях
-//                    : '2';                          // В одном направлении
-//        }
+        if (main.flg_passtype[0])    return "8";    // Квитанция за оформление в поезде
+        if (main.flg_stickettype[1]) return "6";    // Перевозочный документ (для багажа)
+        switch (main.abonement_type.charAt(0)) {
+            case '5': case '6': return "4";         // Билет выходного дня
+            case '0': return main.flg_stickettype[2]
+                    ? "3"                           // В обоих направлениях
+                    : "2";                          // В одном направлении
+        }
         return "5";
     }
 
     private String getT1P22() {
-//        return    main.flg_child == '1' ? '2'            // Детский
-//                : main.benefit_code.equals("00") ? '1'   // Полный
-//                : '3' ;
-        return null;
+        if (main.flg_passtype[0])           return "2"; // Детский
+        if (main.benefit_code.equals("00")) return "1"; // Полный
+        return "3";
     }
 
     private String getT1P25() {
@@ -496,6 +497,10 @@ public final class Level3Prig extends Level3 <Level2Dao.PrigCursor> {
             }
         }
         return 0;
+    }
+
+    private Boolean getLgotP17() {
+        return main.flg_stickettype[2] || main.abonement_type.charAt(0) != 0;
     }
 
     private Integer getLgotP18() {

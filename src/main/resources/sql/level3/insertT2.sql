@@ -1,6 +1,6 @@
 INSERT INTO prigl3.co22_t2
 VALUES (
-        ${id}::bigint,
+           default,
         ${p1}::char(3),
         ${p2}::char(4),
         ${p3}::bigint,

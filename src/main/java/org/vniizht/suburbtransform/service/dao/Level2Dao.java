@@ -7,16 +7,25 @@ import org.vniizht.suburbtransform.model.level2.*;
 import java.util.Date;
 import java.sql.ResultSet;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 public class Level2Dao { private Level2Dao() {}
 
-    public static PrigCursor loadPrig(Date requestDate) {
-        return new PrigCursor(requestDate);
+    public static List<Long> findPrigIdnums(Date requestDate) {
+        return findIdnums("level2/findPrigIdnums", requestDate);
     }
 
-    public static PassCursor loadPass(Date requestDate) {
-        return new PassCursor(requestDate);
+    public static List<Long> findPassIdnums(Date requestDate) {
+        return findIdnums("level2/findPassIdnums", requestDate);
+    }
+
+    public static PrigCursor loadPrig(List<Long> idnums) {
+        return new PrigCursor(idnums);
+    }
+
+    public static PassCursor loadPass(List<Long> idnums) {
+        return new PassCursor(idnums);
     }
 
 //    public static Set<Record> findPassRecords(Date requestDate) {
@@ -35,8 +44,8 @@ public class Level2Dao { private Level2Dao() {}
         @Getter @Setter private List<PrigCost> cost;
 
         @SneakyThrows
-        PrigCursor(Date requestDate) {
-            super("level2/findPrigMain", requestDate);
+        PrigCursor(List<Long> idnums) {
+            super("level2/findPrigMain", idnums);
             loadChildRS("adi", "level2/findPrigAdi");
             loadChildRS("cost", "level2/findPrigCost");
         }
@@ -58,14 +67,16 @@ public class Level2Dao { private Level2Dao() {}
         @Getter @Setter private PassMain       main;
         @Getter @Setter private PassMainUpd     upd;
         @Getter @Setter private List<PassEx>     ex;
+        @Getter @Setter private List<PassLgot> lgot;
         @Getter @Setter private PassRefund   refund;
         @Getter @Setter private List<PassCost> cost;
 
         @SneakyThrows
-        PassCursor(Date requestDate) {
-            super("level2/findPassMain", requestDate);
+        PassCursor(List<Long> idnums) {
+            super("level2/findPassMain", idnums);
             loadChildRS("upd", "level2/findPassMainUpd");
             loadChildRS("ex", "level2/findPassEx");
+            loadChildRS("lgot", "level2/findPassLgot");
             loadChildRS("refund", "level2/findPassRefund");
             loadChildRS("cost", "level2/findPassCost");
         }
@@ -77,6 +88,7 @@ public class Level2Dao { private Level2Dao() {}
             main    = collectMain(PassMain.class);
             upd     = collectOne("upd", PassMainUpd.class);
             ex      = collectList("ex", PassEx.class);
+            lgot    = collectList("lgot", PassLgot.class);
             refund  = collectOne("refund", PassRefund.class);
             cost    = collectList("cost", PassCost.class);
             return this;
@@ -88,16 +100,15 @@ public class Level2Dao { private Level2Dao() {}
 
         private final ResultSet mainRS;
         private final Map<String, ResultSet> childrenRS = new HashMap<>();
-        private final List<Long> idnums = new ArrayList<>();
+        private final List<Long> idnums;
         private Long currentIdnum;
 
         @SneakyThrows
-        Cursor(String queryId, Date requestDate) {
+        Cursor(String queryId, List<Long> idnums) {
+            this.idnums = idnums;
             this.mainRS = SimpleJdbc.query(queryId, new HashMap(){{
-                put("requestDate", requestDate);
+                put("idnums", idnums);
             }});
-            while (mainRS.next()) idnums.add(mainRS.getLong("idnum"));
-            mainRS.beforeFirst();
         }
 
         @Override
@@ -152,5 +163,16 @@ public class Level2Dao { private Level2Dao() {}
             }
             return result;
         }
+    }
+
+
+    @SneakyThrows
+    private static List<Long> findIdnums(String queryId, Date requestDate) {
+        ResultSet rs = SimpleJdbc.query(queryId, new HashMap(){{
+            put("requestDate", requestDate);
+        }});
+        List<Long> result = new ArrayList<>();
+        while (rs.next()) result.add(rs.getLong("idnum"));
+        return result;
     }
 }

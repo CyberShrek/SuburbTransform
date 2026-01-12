@@ -1,9 +1,11 @@
 package org.vniizht.suburbtransform.model.level2;
 
 import lombok.ToString;
+import org.postgresql.jdbc.PgArray;
 
 import java.math.BigDecimal;
 import java.sql.Date;
+import java.util.List;
 
 @ToString(callSuper = true)
 public class PrigMain extends L2Key {
@@ -50,4 +52,7 @@ public class PrigMain extends L2Key {
     public String server_datetime;
     public BigDecimal server_reqnum;
 
+    public Boolean[] flg_costtype;
+    public Boolean[] flg_passtype;
+    public Boolean[] flg_stickettype;
 }

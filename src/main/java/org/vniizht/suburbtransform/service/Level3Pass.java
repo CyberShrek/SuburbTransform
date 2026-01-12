@@ -2,6 +2,7 @@ package org.vniizht.suburbtransform.service;
 
 import org.vniizht.suburbtransform.model.level2.PassCost;
 import org.vniizht.suburbtransform.model.level2.PassEx;
+import org.vniizht.suburbtransform.model.level2.PassLgot;
 import org.vniizht.suburbtransform.model.level2.PassMain;
 import org.vniizht.suburbtransform.model.level3.CO22Meta;
 import org.vniizht.suburbtransform.model.level3.Lgot;
@@ -22,8 +23,12 @@ public final class Level3Pass extends Level3 <Level2Dao.PassCursor> {
     private List<PassCost> costList;
     private List<PassEx>   exList;
     private PassEx         ex;
+    private List<PassLgot> lgotList;
+    private PassLgot       lgot;
     private Date           operationDate;
     private String         noUse;
+
+    private boolean lgotGroupIs22;
     
     public Level3Pass(Long initialT1Serial) {
         super(initialT1Serial);
@@ -35,6 +40,8 @@ public final class Level3Pass extends Level3 <Level2Dao.PassCursor> {
         costList = cursor.getCost();
         exList   = cursor.getEx();
         ex       = exList.isEmpty() ? null : exList.get(0);
+        lgotList = cursor.getLgot();
+        lgot     = lgotList.isEmpty() ? null : lgotList.get(0);
         operationDate = Objects.equals(main.oper_g, "N") && Objects.equals(main.oper, "V")
                 && cursor.getRefund() != null
                 && Objects.equals(cursor.getRefund().flg_retpret, "1")
@@ -45,6 +52,8 @@ public final class Level3Pass extends Level3 <Level2Dao.PassCursor> {
             noUse = cursor.getUpd().no_use;
         else
             noUse = "0";
+
+        lgotGroupIs22 = lgot != null && lgot.benefit_prigcode != null && lgot.benefit_prigcode.startsWith("22");
     }
 
     @Override
@@ -82,11 +91,11 @@ public final class Level3Pass extends Level3 <Level2Dao.PassCursor> {
                 .p19("4")
                 .p20("0" + main.carriage_class)
                 .p21("1")
-//                .p22(getT1P22())
+                .p22(getT1P22())
                 .p23("3")
-//                .p24(getT1P24())
+                .p24(getT1P24())
                 .p25(getT1P25())
-//                .p26(getT1P26())
+                .p26(getT1P26()) // !!!!!!!!!!!!!!!!!!!!!
                 .p30(HandbookDao.getOkatoByStation(main.arrival_station, main.arrival_date))
                 .p31(HandbookDao.getArea(main.arrival_station, main.arrival_date))
                 .p32(main.distance)
@@ -96,8 +105,8 @@ public final class Level3Pass extends Level3 <Level2Dao.PassCursor> {
                 .p55("0")
                 .p56("000")
                 .p57(" ")
-//                .p58(getT1P58())
-//                .p59(getT1P59())
+                .p58(getT1P58())
+                .p59(getT1P59())
                 .p60(String.valueOf(main.subagent_code))
                 .p61("0")
                 .p62(0)
@@ -132,19 +141,20 @@ public final class Level3Pass extends Level3 <Level2Dao.PassCursor> {
         return Lgot.builder()
                 .request_date(main.request_date)
                 .yyyymm(yyyyMM)
-//                .list("R800" + (main.paymenttype == "Ж" && ex != null && ex.lgot_info != null && ex.lgot_info.startsWith("22") ? 'Z' : 'G'))
+                .list("R800" + (Objects.equals(main.paymenttype, "Ж")
+                        && lgotGroupIs22 ? 'Z' : 'G'))
                 .p2(HandbookDao.getRoad3(main.sale_station, operationDate))
                 .p3(HandbookDao.getDepartment(main.sale_station, operationDate))
                 .p4("0")
                 .p5(getLgotP5())
                 .p6("1")
-//                .p7(getT1P24())
+                .p7(getT1P24())
                 .p8(Util.addLeadingZeros(String.valueOf(main.carrier_code), 4))
                 .p9(HandbookDao.getOkatoByRegion(main.benefitcnt_code, operationDate))
-//                .p10(ex != null && ex.lgot_info != null ? ex.nomlgud : null)
-//                .p11(getLgotP11())
-//                .p12(getLgotP12())
-//                .p13(getLgotP13())
+                .p10(lgot == null ? null : lgot.document_num)
+                .p11(getLgotP11())
+                .p12(getLgotP12())
+                .p13(getLgotP13())
                 .p14(getLgotP14())
                 .p16(getLgotP16())
                 .p17(Objects.equals(main.trip_direction, "3"))
@@ -213,21 +223,20 @@ public final class Level3Pass extends Level3 <Level2Dao.PassCursor> {
         return costList.stream().mapToDouble(cost -> cost.sum_te.doubleValue()).sum() / main.distance;
     }
 
-//    private String getT1P22() {
-//        boolean[] f_tick = Util.parsePostgresBooleanArray(main.f_tick);
-//        return Objects.requireNonNull(f_tick).length > 2 && f_tick[2] ? "2"                                        // Детский
-//                : !main.benefit_code.equals("000") || f_tick.length > 4 && f_tick[4] ? "3"  // Льготный
-//                :  f_tick.length > 1 && f_tick[1] ? "'1' "                                    // Полный
-//                : "0" ;
-//    }
+    private String getT1P22() {
+        return main.f_tick.length > 2 && main.f_tick[2] ? "2"                                        // Детский
+                : !main.benefit_code.equals("000") || main.f_tick.length > 4 && main.f_tick[4] ? "3"  // Льготный
+                :  main.f_tick.length > 1 && main.f_tick[1] ? "'1' "                                    // Полный
+                : "0" ;
+    }
 
-//    private String getT1P24() {
-//        return Objects.equals(main.paymenttype, "В")
-//                ? "21" + String.format("%02d", main.military_code)
-//                : ex != null && ex.lgot_info != null && ex.lgot_info.length() > 4 && !main.benefit_code.equals("000") && !main.benefit_code.equals("013")
-//                ? ex.lgot_info.substring(0, 4)
-//                : "0000";
-//    }
+    private String getT1P24() {
+        return Objects.equals(main.paymenttype, "В")
+                ? "21" + String.format("%02d", main.military_code)
+                : lgot != null && lgot.benefit_prigcode != null && !main.benefit_code.equals("000") && !main.benefit_code.equals("013")
+                ? lgot.benefit_prigcode
+                : "0000";
+    }
 
     private String getT1P25() {
         switch (main.paymenttype) {
@@ -239,13 +248,13 @@ public final class Level3Pass extends Level3 <Level2Dao.PassCursor> {
         }
     }
 
-//    private String getT1P26() {
-//        return ex == null || ex.lgot_info == null || ex.lgot_info.length() < 2 ? null
-//                :
-//                HandbookDao.getGvc(
-//                        ex.lgot_info.substring(0, 2),
-//                        main.benefit_code, operationDate);
-//    }
+    private String getT1P26() {
+        return lgot == null || lgot.benefit_prigcode == null || lgot.benefit_prigcode.length() < 2 ? null
+                :
+                HandbookDao.getGvc(
+                        lgot.benefit_prigcode.substring(0, 2),
+                        main.benefit_code, operationDate);
+    }
 
     private Double getT1P39() {
         return costList.stream().mapToDouble(costListItem -> {
@@ -317,20 +326,23 @@ public final class Level3Pass extends Level3 <Level2Dao.PassCursor> {
         return 0L;
     }
 
-//    private Character getT1P58() {
-//        if (ex != null && ex.lgot_info != null && ex.lgot_info.startsWith("22") && ex.lgot_info.length() >= 10) switch (ex.lgot_info.charAt(9)) {
-//            case '0': case '1': case '2': case '3': case '4': return '0';
-//            case '5': case '6': case '7': case '8': case '9': return '1';
-//        }
-//        return null;
-//    }
-//
-//    private Character getT1P59() {
-//        if (Objects.equals(main.paymenttype, "Ж") && ex != null && ex.lgot_info != null && ex.lgot_info.startsWith("22")) switch (ex.lgot_info.charAt(5)){
-//            case 'Ф': case 'Д': return '1';
-//        }
-//        return '0';
-//    }
+    private String getT1P58() {
+        if (lgot != null && lgot.bilgroup_code != null && lgot.bilgroup_code.length() >= 3) switch (lgot.bilgroup_code.charAt(2)) {
+            case '0': case '1': case '2': case '3': case '4': return "0";
+            case '5': case '6': case '7': case '8': case '9': return "1";
+        }
+        return null;
+    }
+
+    private String getT1P59() {
+        if (Objects.equals(main.paymenttype, "Ж") && lgot != null
+                && lgotGroupIs22
+                && lgot.employee_cat != null && !lgot.employee_cat.isEmpty())
+            switch (lgot.employee_cat){
+            case "Ф": case "Д": return "1";
+        }
+        return "0";
+    }
 
     private String getLgotP5() {
         switch (main.oper + main.oper_g) {
@@ -343,23 +355,23 @@ public final class Level3Pass extends Level3 <Level2Dao.PassCursor> {
         return "0";
     }
 
-//    private String getLgotP11() {
-//        return ex != null && ex.lgot_info != null && ex.lgot_info.startsWith("22") && ex.lgot_info.length() >= 12
-//                ? ex.lgot_info.substring(7, 12)
-//                : main.saleregion_code;
-//    }
-//
-//    private String getLgotP12() {
-//        return ex != null && ex.lgot_info != null && ex.lgot_info.startsWith("22") && ex.lgot_info.length() >= 23
-//                ? ex.lgot_info.substring(13, 23)
-//                : null;
-//    }
-//
-//    private Character getLgotP13() {
-//        return ex != null && ex.lgot_info != null && ex.lgot_info.startsWith("22") && ex.lgot_info.length() >= 5
-//                ? ex.lgot_info.charAt(5)
-//                : '0';
-//    }
+    private String getLgotP11() {
+        return lgotGroupIs22
+                ? lgot.bilgroup_code
+                : main.saleregion_code;
+    }
+
+    private String getLgotP12() {
+        return lgotGroupIs22
+                ? lgot.employee_unit
+                : null;
+    }
+
+    private String getLgotP13() {
+        return lgotGroupIs22
+                ? lgot.employee_unit
+                : "0";
+    }
 
     private String getLgotP14() {
         if(ex == null || ex.last_name == null) return null;
@@ -368,9 +380,13 @@ public final class Level3Pass extends Level3 <Level2Dao.PassCursor> {
         String firstName = ex.first_name == null ? "" : ex.first_name.trim();
         String patronymic = ex.patronymic == null ? "" : ex.patronymic.trim();
 
-        return lastName + ' '
-                + (firstName.isEmpty() ? "" : firstName.charAt(0))
-                + (patronymic.isEmpty() ? "" : patronymic.charAt(0));
+        if (lgotGroupIs22)
+            return lastName + ' '
+                    + (firstName.isEmpty() ? "" : firstName.charAt(0))
+                    + (patronymic.isEmpty() ? "" : patronymic.charAt(0));
+        else
+            return lastName + ' '
+                    + (firstName.isEmpty() ? "" : firstName.substring(0, firstName.length() < 2 ? 1 : 2));
     }
 
     private int getLgotP16() {

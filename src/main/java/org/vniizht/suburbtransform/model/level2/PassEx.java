@@ -10,8 +10,6 @@ public class PassEx extends L2Key {
     public Integer     npp;
     public String      ticket_ser;
     public BigDecimal  ticket_num;
-//    public String      lgot_info;
-//    public String      nomlgud;
     public String      last_name;
     public String      first_name;
     public String      patronymic;

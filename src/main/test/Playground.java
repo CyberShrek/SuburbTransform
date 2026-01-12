@@ -1,8 +1,10 @@
+
+
 import org.vniizht.suburbtransform.model.TransformationOptions;
 import org.vniizht.suburbtransform.service.Transformation;
-import org.vniizht.suburbtransform.service.dao.Level2Dao;
 
 import java.sql.Date;
+
 
 public class Playground {
 
@@ -16,7 +18,8 @@ public class Playground {
 //        Level2Dao.PrigCursor record = Level2Dao.loadPrigRecord(requestDate);
 
 
-        Transformation.transformOrNull(new TransformationOptions(requestDate, false, true));
+        Transformation.run(new TransformationOptions(requestDate, false, true));
+
 
 //        Level2Dao.PassCursor passCursor = Level2Dao.loadPass(requestDate);
 //        while (passCursor.hasNext()) {
@@ -24,6 +27,5 @@ public class Playground {
 
 //            System.out.println(record.getMain().idnum + " f_tick: " + record.getMain().f_tick.toString());
 //        }
-//        System.out.println(new java.util.Date());
     }
 }

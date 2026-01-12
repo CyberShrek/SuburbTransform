@@ -1,6 +1,6 @@
 INSERT INTO prigl3.co22_meta
 VALUES (
-        ${id}::bigint,
+           default,
         ${t1_id}::bigint,
         ${request_date}::date,
         ${l2_prig_idnum}::bigint,

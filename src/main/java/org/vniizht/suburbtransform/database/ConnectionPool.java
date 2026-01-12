@@ -16,7 +16,7 @@ import java.sql.SQLException;
 abstract class ConnectionPool {
 
 //    private static final String xmlConfigLocation = "/opt/read/datab/DEFAULTX.XML";
-    private static final String xmlConfigLocation = "C:\\HelloWorld\\projects\\WAFW\\SuburbTransform\\DEFAULTX.XML";
+    private static final String xmlConfigLocation = "C:\\Users\\illyc\\Desktop\\Programming\\Projects\\SuburbTransform\\DEFAULTX.XML";
     private static final String primaryXmlDS = "NGDS";
     private static final String loggerXmlDS = "LogDS";
 

@@ -21,11 +21,15 @@ public class SimpleJdbc {
         try {
             connection = ConnectionPool.getConnection();
             connection.setAutoCommit(false);
-            connection.commit();
         }
         catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @SneakyThrows
+    public static void commit() {
+        connection.commit();
     }
 
     public static List<Map<String, Object>> queryForMatrix(String queryId) {
@@ -96,9 +100,9 @@ public class SimpleJdbc {
             for (int i = 0; i < paramsList.size(); i++) {
                 setParams(statement, paramNames, paramsMapper.apply(paramsList.get(i)));
                 statement.addBatch();
-                if (i % batchSize == 0 || i == paramsList.size() - 1) {
+                if ((i + 1) % batchSize == 0 || i == paramsList.size() - 1) {
                     statement.executeBatch();
-                    log.reline(i + " из " + paramsList.size());
+                    log.reline(i + 1 + " из " + paramsList.size());
                 }
             }
             log.nextLine();
@@ -129,7 +133,11 @@ public class SimpleJdbc {
         try {
             T obj = clasS.newInstance();
             for (Field field : clasS.getFields()) {
-                field.set(obj, rs.getObject(field.getName()));
+                if (field.getType().isArray()) {
+                    field.set(obj, rs.getArray(field.getName()).getArray());
+                }
+                else
+                    field.set(obj, rs.getObject(field.getName()));
             }
             return obj;
         }

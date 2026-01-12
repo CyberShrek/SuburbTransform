@@ -1,7 +1,6 @@
 package org.vniizht.suburbtransform.model.level2;
 
 import lombok.ToString;
-import org.postgresql.jdbc.PgArray;
 
 import java.sql.Date;
 import java.sql.Time;
@@ -26,7 +25,6 @@ public class PassMain extends L2Key {
     public String      sale_station;
     public String      departure_station;
     public String      arrival_station;
-    public PgArray     f_tick;
     public String      carriage_class;
     public String      benefit_code;
     public String      benefitcnt_code;
@@ -35,4 +33,6 @@ public class PassMain extends L2Key {
     public Integer     distance;
     public Integer     persons_qty;
     public Integer     seats_qty;
+
+    public Boolean[]   f_tick;
 }

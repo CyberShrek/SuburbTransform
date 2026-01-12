@@ -6,8 +6,6 @@ import java.util.Date;
 
 @Builder
 public class CO22Meta {
-
-    public Long id;
     public Long t1_id;
     public Date request_date;
     public Long l2_prig_idnum;

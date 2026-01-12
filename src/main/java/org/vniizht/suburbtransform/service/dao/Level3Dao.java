@@ -11,7 +11,11 @@ import java.util.*;
 
 public class Level3Dao {
 
-    private static final int    BATCH_SIZE      = 500;
+    private static final int    BATCH_SIZE      = 1000;
+
+    public static void commit() {
+        SimpleJdbc.commit();
+    }
 
     @SneakyThrows
     public static Date getNextRequestDateOrNull(){
@@ -75,8 +79,8 @@ public class Level3Dao {
     public static void saveT6s(List<T6> t6List, Log log){
         saveList("level3/insertT6", t6List, log);
     }
-    public static void saveCO22Metas(List<CO22Meta> co22MetaList, Log log){
-        saveList("level3/insertCO22Meta", co22MetaList, log);
+    public static void saveMetas(List<CO22Meta> co22MetaList, Log log){
+        saveList("level3/insertMeta", co22MetaList, log);
     }
     public static void saveLgots(List<Lgot> lgotList, Log log){
         saveList("level3/insertLgot", lgotList, log);
