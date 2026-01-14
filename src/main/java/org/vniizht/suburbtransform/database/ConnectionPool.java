@@ -2,14 +2,17 @@ package org.vniizht.suburbtransform.database;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import org.vniizht.suburbtransform.util.Resources;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 
 import javax.sql.DataSource;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
+import java.io.StringReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.Connection;
@@ -32,8 +35,6 @@ abstract class ConnectionPool {
                 xmlConfigFile = new File(mainXmlConfigLocation);
             } else {
                 System.out.println("Конфигурация не найдена: " + mainXmlConfigLocation);
-                System.out.println("Использую " + spareXmlConfigLocation);
-                xmlConfigFile = new File(spareXmlConfigLocation);
             }
             dataSource       = getXmlDataSource(primaryXmlDS);
             loggerDataSource = getXmlDataSource(loggerXmlDS);
@@ -53,7 +54,9 @@ abstract class ConnectionPool {
 
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
-        Document doc = builder.parse(xmlConfigFile);
+        Document doc = xmlConfigFile == null
+                ? builder.parse(new InputSource(new StringReader(Resources.load(spareXmlConfigLocation))))
+                : builder.parse(xmlConfigFile);
         doc.getDocumentElement().normalize();
 
         NodeList tasks = doc.getElementsByTagName("task");

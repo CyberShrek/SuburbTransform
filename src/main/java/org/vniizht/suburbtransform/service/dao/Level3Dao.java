@@ -7,7 +7,10 @@ import org.vniizht.suburbtransform.util.Log;
 import org.vniizht.suburbtransform.util.Util;
 
 import java.sql.ResultSet;
-import java.util.*;
+import java.sql.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class Level3Dao {
 

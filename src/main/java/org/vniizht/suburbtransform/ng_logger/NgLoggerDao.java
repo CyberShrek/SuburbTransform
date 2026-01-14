@@ -21,7 +21,7 @@ public class NgLoggerDao { private NgLoggerDao() {}
         SimpleJdbcLogger.update("nglog/addProcess", new HashMap<String, Object>(){{
             put("systemName", systemName);
             put("processName", processName);
-            put("hostAddress", Inet4Address.getLocalHost().getHostName());
+            put("hostAddress", Inet4Address.getLocalHost().getHostAddress());
         }});
     }
 
@@ -36,7 +36,7 @@ public class NgLoggerDao { private NgLoggerDao() {}
             put("messageCode", log.getMessageCode());
             put("errorCode", errorCode);
             put("messageText", log.getMessageText().replaceAll("'", "''"));
-            put("hostAddress", Inet4Address.getLocalHost().getHostName());
+            put("hostAddress", Inet4Address.getLocalHost().getHostAddress());
             put("systemName", systemName);
             put("processName", processName);
             put("processId", processId);

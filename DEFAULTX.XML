@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="windows-1251" ?> 
-<tasks>
-<task datasource="NGDS" nameuser="ngwriter" pass="NGwriter2020" driverName="org.postgresql.Driver" jdbcString="jdbc:postgresql://pg01exp.vniizht.lan:5432/abd" />
-<task datasource="LogDS" nameuser="monitorwriter" pass="MONITORwriter2020" driverName="org.postgresql.Driver" jdbcString="jdbc:postgresql://pg01exp.vniizht.lan:5432/abd" />
-<task datasource="PostgresDS" nameuser="nsiwriter" pass="NSIwriter2020" driverName="org.postgresql.Driver" jdbcString="jdbc:postgresql://pg01exp.vniizht.lan:5432/abd" />
-</tasks>

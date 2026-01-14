@@ -4,11 +4,9 @@ import lombok.*;
 import org.vniizht.suburbtransform.database.SimpleJdbc;
 import org.vniizht.suburbtransform.model.level2.*;
 
-import java.util.Date;
+import java.sql.Date;
 import java.sql.ResultSet;
 import java.util.*;
-import java.util.stream.Collectors;
-
 
 public class Level2Dao { private Level2Dao() {}
 

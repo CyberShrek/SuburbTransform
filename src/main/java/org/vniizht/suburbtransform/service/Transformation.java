@@ -23,8 +23,17 @@ public class Transformation { private Transformation() {}
 
         Date startTime = new Date();
         try {
-            boolean prigWasTransformed = Level3Dao.prigWasTransformedForDate(options.date),
-                    passWasTransformed = Level3Dao.passWasTransformedForDate(options.date);
+            java.sql.Date requestDate;
+            if (options.date == null) {
+                requestDate = getRequestDate();
+                if (requestDate == null) return;
+            }
+            else {
+                requestDate = new java.sql.Date(options.date.getTime());
+            }
+
+            boolean prigWasTransformed = Level3Dao.prigWasTransformedForDate(requestDate),
+                    passWasTransformed = Level3Dao.passWasTransformedForDate(requestDate);
 
             if(!options.pass && !options.prig) { // auto
                 options.prig = !prigWasTransformed;
@@ -33,25 +42,21 @@ public class Transformation { private Transformation() {}
                     options.prig = options.pass = true;
                 };
             }
-            if(options.date == null) {
-                options.date = getRequestDate();
-                if(options.date == null) return;
-            }
 
             log.nextTimeLine("Начинаю трансформацию записей за "
-                    + Util.formatDate(options.date, "dd.MM.yyyy"));
+                    + Util.formatDate(requestDate, "dd.MM.yyyy"));
             log.sumUp((options.prig ? " l2_prig" : "") + (options.pass ? " l2_pass" : ""));
 
             log.nextTimeLine("Получаю справочники...");
             HandbookDao.loadCache();
 
-            log.nextTimeLine("Удаляю старые записи третьего уровня за " + Util.formatDate(options.date, "dd.MM.yyyy") + "...");
+            log.nextTimeLine("Удаляю старые записи третьего уровня за " + Util.formatDate(requestDate, "dd.MM.yyyy") + "...");
 
             if (options.prig) {
                 log.nextLine("prig:");
 
                 if (prigWasTransformed) {
-                    Level3Dao.deletePrigForDate(options.date);
+                    Level3Dao.deletePrigForDate(requestDate);
                 }
                 else
                     log.nextLine("Нечего удалять");
@@ -59,24 +64,24 @@ public class Transformation { private Transformation() {}
             if (options.pass) {
                 log.nextLine("pass:");
                 if (passWasTransformed) {
-                    Level3Dao.deletePassForDate(options.date);
+                    Level3Dao.deletePassForDate(requestDate);
                 }
                 else
                     log.nextLine("Нечего удалять");
             }
             if (passWasTransformed && options.pass || prigWasTransformed && options.prig) {
                 log.nextLine("lgot:");
-                Level3Dao.deleteLgotForDate(options.date);
+                Level3Dao.deleteLgotForDate(requestDate);
             }
             log.sumUp();
 
             if (options.prig) {
                 log.nextTimeLine("Выполняю трансформацию l2_prig...");
-                complete(transformPrigOrNull(options.date));
+                complete(transformPrigOrNull(requestDate));
             }
             if (options.pass) {
                 log.nextTimeLine("Выполняю трансформацию l2_pass...");
-                complete(transformPassOrNull(options.date));
+                complete(transformPassOrNull(requestDate));
             }
             Level3Dao.commit();
             log.nextTimeLine("Конец выполнения.");
@@ -88,7 +93,7 @@ public class Transformation { private Transformation() {}
         }
     }
 
-    private static Level3Prig transformPrigOrNull(Date requestDate) {
+    private static Level3Prig transformPrigOrNull(java.sql.Date requestDate) {
         return (Level3Prig) transformOrNull(
                 "l2_prig",
                 () -> Level2Dao.findPrigIdnums(requestDate),
@@ -97,7 +102,7 @@ public class Transformation { private Transformation() {}
         );
     }
 
-    private static Level3Pass transformPassOrNull(Date requestDate) {
+    private static Level3Pass transformPassOrNull(java.sql.Date requestDate) {
         return (Level3Pass) transformOrNull(
                 "l2_prig",
                 () -> Level2Dao.findPassIdnums(requestDate),
@@ -125,9 +130,9 @@ public class Transformation { private Transformation() {}
         return level3;
     }
 
-    private static Date getRequestDate() {
+    private static java.sql.Date getRequestDate() {
         log.nextTimeLine("Определяю дату запроса...");
-        Date requestDate = Level3Dao.getNextRequestDateOrNull();
+        java.sql.Date requestDate = Level3Dao.getNextRequestDateOrNull();
         if(requestDate == null) {
             log.nextTimeLine("На третьем уровне ещё нет данных. Повторите запрос с указанием даты.");
         }
@@ -192,5 +197,4 @@ public class Transformation { private Transformation() {}
             }
         }) + "c");
     }
-
 }

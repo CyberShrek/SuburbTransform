@@ -4,7 +4,7 @@ target/*
 !**/src/main/**/target/
 !**/src/test/**/target/
 
-DEFAULTX.XML
+src/main/resources/DEFAULTX.XML
 dependency-reduced-pom.xml
 
 ### IntelliJ IDEA ###
