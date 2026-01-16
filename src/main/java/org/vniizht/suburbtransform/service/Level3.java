@@ -144,14 +144,14 @@ abstract public class Level3 <L2_CURSOR extends Level2Dao.Cursor> {
             if(edgeOnly || t1.p21.equals("6")) {
                 // Добавление разницы в первую запись
                 T4 firstT4 = t4.get(0);
-                firstT4.p4 = (int)   (firstT4.p7 + incomeDelta);
-                firstT4.p8 = (float) (firstT4.p8 + outcomeDelta);
+                firstT4.p7 = firstT4.p7 + incomeDelta;
+                firstT4.p8 = firstT4.p8 + outcomeDelta;
             } else {
                 // Распределение разницы по всем записям в зависимости от километража
                 int totalDistance = t4.stream().mapToInt(t4 -> t4.p9).sum();
                 for (T4 t4Item : t4) {
-                    t4Item.p7 = ((float) Math.round((t4Item.p7 + incomeDelta * t4Item.p9 / totalDistance) * 100) / 100);
-                    t4Item.p8 = ((float) Math.round((t4Item.p8 + outcomeDelta * t4Item.p9 / totalDistance) * 100) / 100);
+                    t4Item.p7 = (double) (Math.round((t4Item.p7 + incomeDelta * t4Item.p9 / totalDistance) * 100) / 100);
+                    t4Item.p8 = (double) (Math.round((t4Item.p8 + outcomeDelta * t4Item.p9 / totalDistance) * 100) / 100);
                 }
 
                 // Возможный остаток при распределении добавляется в первую запись

@@ -18,7 +18,7 @@ public class Playground {
 //        Level2Dao.PrigCursor record = Level2Dao.loadPrigRecord(requestDate);
 
 
-        Transformation.run(new TransformationOptions(requestDate, true, false));
+        Transformation.run(new TransformationOptions(requestDate, false, true));
 
 
 //        Level2Dao.PassCursor passCursor = Level2Dao.loadPass(requestDate);

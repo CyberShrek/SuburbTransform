@@ -58,14 +58,16 @@ public final class Level3Pass extends Level3 <Level2Dao.PassCursor> {
 
     @Override
     protected boolean t1Exists() {
-        return !Objects.equals(noUse, "1");
+        return (lgot == null || lgot.npp == 1) &&
+                (ex == null || ex.npp == 1) &&
+                !Objects.equals(noUse, "1");
     }
 
     @Override
     protected boolean lgotExists() {
-        return !Objects.equals(noUse, "1")
-                && !main.benefit_code.equals("000")
-                && !main.benefit_code.equals("021");
+        return !Objects.equals(noUse, "1") &&
+                !main.benefit_code.equals("000") &&
+                !main.paymenttype.equals("В");
     }
 
     @Override
@@ -95,7 +97,7 @@ public final class Level3Pass extends Level3 <Level2Dao.PassCursor> {
                 .p23("3")
                 .p24(getT1P24())
                 .p25(getT1P25())
-                .p26(getT1P26()) // !!!!!!!!!!!!!!!!!!!!!
+                .p26(getT1P26())
                 .p30(HandbookDao.getOkatoByStation(main.arrival_station, main.arrival_date))
                 .p31(HandbookDao.getArea(main.arrival_station, main.arrival_date))
                 .p32(main.distance)
@@ -193,11 +195,32 @@ public final class Level3Pass extends Level3 <Level2Dao.PassCursor> {
     protected Set<T1> multiplyT1(T1 t1) {
         Set<T1> result = new LinkedHashSet<>();
         result.add(t1);
-        if (!operationDate.equals(main.departure_date)) {
+        String operationYYYYMM = Util.formatDate(operationDate, "yyyyMM");
+        String departureYYYYMM = Util.formatDate(main.departure_date, "yyyyMM");
+        if (!operationYYYYMM.equals(departureYYYYMM)) {
             result.add(t1.toBuilder()
                     .yyyymm(Integer.parseInt(Util.formatDate(main.departure_date, "yyyyMM")))
+                    .p34(0.0)
+                    .p35(0.0)
+                    .p36(0.0)
+                    .p37(0.0)
+                    .p38(0.0)
+                    .p39(0.0)
+                    .p40(0.0)
+                    .p41(0.0)
+                    .p42(0.0)
+                    .p43(0.0)
+                    .p44(0.0)
+                    .p45(0.0)
+                    .p46(0.0)
+                    .p47(0.0)
+                    .p48(0.0)
+                    .p49(0.0)
+                    .p50(0.0)
+                    .p51(0L)
                     .build()
             );
+            t1.p33 = 0L;
         }
         return result;
     }
@@ -226,7 +249,7 @@ public final class Level3Pass extends Level3 <Level2Dao.PassCursor> {
     private String getT1P22() {
         return main.f_tick.length > 2 && main.f_tick[2] ? "2"                                        // Детский
                 : !main.benefit_code.equals("000") || main.f_tick.length > 4 && main.f_tick[4] ? "3"  // Льготный
-                :  main.f_tick.length > 1 && main.f_tick[1] ? "'1' "                                    // Полный
+                :  main.f_tick.length > 1 && main.f_tick[1] ? "1"                                    // Полный
                 : "0" ;
     }
 
@@ -249,9 +272,9 @@ public final class Level3Pass extends Level3 <Level2Dao.PassCursor> {
     }
 
     private String getT1P26() {
-        return lgot == null || lgot.benefit_prigcode == null || lgot.benefit_prigcode.isEmpty() ? null
-                :
-                HandbookDao.getGvc(lgot.benefit_prigcode, operationDate);
+        return lgot == null || lgot.benefit_prigcode == null || lgot.benefit_prigcode.isEmpty()
+                ? null
+                : HandbookDao.getGvc(lgot.benefit_prigcode, operationDate);
     }
 
     private Double getT1P39() {
@@ -333,9 +356,10 @@ public final class Level3Pass extends Level3 <Level2Dao.PassCursor> {
     }
 
     private String getT1P59() {
-        if (Objects.equals(main.paymenttype, "Ж") && lgot != null
-                && lgotGroupIs22
-                && lgot.employee_cat != null && !lgot.employee_cat.isEmpty())
+        if (!Objects.equals(main.paymenttype, "Ж")) return null;
+        if (lgotGroupIs22 &&
+                lgot.employee_cat != null &&
+                !lgot.employee_cat.isEmpty())
             switch (lgot.employee_cat){
             case "Ф": case "Д": return "1";
         }
@@ -407,8 +431,6 @@ public final class Level3Pass extends Level3 <Level2Dao.PassCursor> {
                                 case 116:
                                     switch (main.paymenttype) {
                                         case "9":
-                                        case "В":
-                                        case "B":
                                         case "Б":
                                             return cost.sum_nde.doubleValue();
                                     }

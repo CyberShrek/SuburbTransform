@@ -26,7 +26,10 @@ public final class Level3Prig extends Level3 <Level2Dao.PrigCursor> {
     private List<PrigCost>  costList;
     private PrigAdi         adi;
     private boolean         isAbonement;
-    private Boolean         isRefund;
+    private boolean         isBasic;
+    private boolean         isRefund;
+    private boolean         isRefuse;
+    private boolean         isCancel;
 
     public Level3Prig(Long initialT1Serial) {
         super(initialT1Serial);
@@ -41,17 +44,20 @@ public final class Level3Prig extends Level3 <Level2Dao.PrigCursor> {
         fullBenefit = main.benefitgroup_code + main.benefit_code;
         yyyyMM = Integer.parseInt(Util.formatDate(main.operation_date, "yyyyMM"));
         if (main.no_use == null) main.no_use = "0";
-        isRefund = main.oper_g.equals("N") && main.oper.equals("V");
+        isBasic  = main.oper.charAt(0) == 'O' && main.oper_g.charAt(0) == 'N';
+        isRefund = main.oper.charAt(0) == 'V' && main.oper_g.charAt(0) == 'N';
+        isRefuse = main.oper.charAt(0) == 'O' && main.oper_g.charAt(0) == 'O';
+        isCancel = main.oper.charAt(0) == 'O' && main.oper_g.charAt(0) == 'G';
     }
 
     @Override
     protected boolean t1Exists() {
-        return !main.no_use.equals("1");
+        return !Objects.equals(main.no_use, "1");
     }
 
     @Override
     protected boolean lgotExists() {
-        return main.no_use.equals("1")
+        return t1Exists()
                 && !main.benefit_code.equals("00")
                 && !main.benefitgroup_code.equals("21");
     }
@@ -88,7 +94,7 @@ public final class Level3Prig extends Level3 <Level2Dao.PrigCursor> {
                 .p31(HandbookDao.getArea(main.arrival_station, main.operation_date))
                 .p32(costList.stream().mapToInt(costItem -> costItem.route_distance).sum())
 
-                .p33((isAbonement ? (long) (short) (isRefund ? -1 : 1) * main.pass_qty : main.carryon_weight))
+                .p33(getT1P33())
                 .p34(0.0)
                 .p35(0.0)
                 .p36(getT1P36())
@@ -299,6 +305,7 @@ public final class Level3Prig extends Level3 <Level2Dao.PrigCursor> {
 
     private String getT1P19() {
         switch (main.train_category) {
+            case "Л": return "Л";           // просто скорые пригородные
             case "С": return "6";           // скорые пригородные поезда типа «Спутник» (7ХХХ)
             case "7": return "5";           // скорые пригородные поезда без предоставления мест (7ХХХ)
             case "А": return "8";           // рельсовые автобусы 6000-е
@@ -343,36 +350,41 @@ public final class Level3Prig extends Level3 <Level2Dao.PrigCursor> {
         }
     }
 
+    private Long getT1P33() {
+        return (long)
+                (isRefund || isRefuse || isCancel ? -1 : 1) * (getT1P21().equals("6")
+                ? main.carryon_weight
+                : main.pass_qty);
+    }
+
     private Double getT1P36() {
-        switch (main.oper){
-            case "O": return main.tariff_sum.doubleValue();
-            case "V": return -main.refund_sum.doubleValue();
-        }
-        return isRefund ? -main.refund_sum.doubleValue() : 0;
+        return isRefund
+                ? -main.refund_sum.doubleValue()
+                : isRefuse || isCancel
+                ? -main.tariff_sum.doubleValue()
+                : main.tariff_sum.doubleValue();
     }
 
     private Double getT1P39() {
-        switch (main.oper){
-            case "O": return main.fee_sum.doubleValue();
-            case "V": return -main.refundfee_sum.doubleValue();
-        }
-        return isRefund ? -main.refundfee_sum.doubleValue() : 0;
+        return isRefund
+                ? -main.refundfee_sum.doubleValue()
+                : isRefuse || isCancel
+                ? -main.fee_sum.doubleValue()
+                : main.fee_sum.doubleValue();
     }
 
     private Double getT1P44() {
-        switch (main.oper){
-            case "O": return main.department_sum.doubleValue();
-            case "V": return -main.refunddepart_sum.doubleValue();
-        }
-        return isRefund ? -main.refunddepart_sum.doubleValue() : 0;
+        return isRefund
+                ? -main.refunddepart_sum.doubleValue()
+                : isRefuse || isCancel
+                ? -main.department_sum.doubleValue()
+                : main.department_sum.doubleValue();
     }
 
     private Long getT1P51() {
-        if(Objects.equals(main.oper_g, "N")) switch (main.oper) {
-            case "O": return (long)  main.pass_qty;
-            case "V": return (long) -main.pass_qty;
-        }
-        return isRefund ? -main.pass_qty : 0L;
+        return (long) (isRefund || isRefuse || isCancel
+                ? -main.pass_qty
+                : main.pass_qty);
     }
 
     private String getT1P52() {
@@ -387,7 +399,7 @@ public final class Level3Prig extends Level3 <Level2Dao.PrigCursor> {
             }
         }
 
-        return tSite.trim().charAt(1) + "";
+        return tSite.trim().substring(1, 1);
     }
 
     private String getT1P55() {
@@ -485,16 +497,9 @@ public final class Level3Prig extends Level3 <Level2Dao.PrigCursor> {
 
     private Integer getLgotP16() {
         if (main.abonement_type.charAt(0) == '0'){
-            switch (main.oper) {
-                case "O": switch (main.oper_g) {
-                    case "N": return main.pass_qty;
-                    case "G":
-                    case "O":
-                        return -main.pass_qty;
-                }
-                case "V": if (Objects.equals(main.oper_g, "N"))
-                    return -main.pass_qty;
-            }
+            return isRefund || isRefuse || isCancel
+                    ? (short) -main.pass_qty
+                    : main.pass_qty;
         }
         return 0;
     }
@@ -504,63 +509,44 @@ public final class Level3Prig extends Level3 <Level2Dao.PrigCursor> {
     }
 
     private Integer getLgotP18() {
-        if (main.abonement_type.charAt(0) == '0'){
-            if (Objects.equals(main.oper, "O") && (Objects.equals(main.oper_g, "G") || Objects.equals(main.oper_g, "O")))
+        if (main.abonement_type.charAt(0) != '0'){
+            if (isRefuse || isCancel || isRefund)
                 return -1;
-            if (Objects.equals(main.oper, "V") && Objects.equals(main.oper_g, "N"))
-                return -1;
+            return 1;
         }
-        return 1;
+        return 0;
     }
 
     private String getLgotP20() {
-        if (!isAbonement)
-            return " ";
-        switch (main.abonement_type.trim()) {
-            case "1": return "9";
-            case "2": return "7";
-            case "4": return "1";
-            case "5": return "2";
-            case "7": return "4";
-            case "8": return "5";
-            default: return  "0";
-        }
+        if (main.abonement_type.charAt(0) != '0')
+            switch (main.abonement_type.trim()) {
+                case "1": return "9";
+                case "2": return "7";
+                case "4": return "1";
+                case "5": return "2";
+                case "7": return "4";
+                case "8": return "5";
+                default: return  "0";
+            }
+        return " ";
     }
 
     private Double getLgotP27() {
-        Double sum = (double) 0;
-        switch (main.oper) {
-            case "O": switch (main.oper_g) {
-                case "N":
-                    sum = main.department_sum.doubleValue();
-                    break;
-                case "G":
-                case "O":
-                    sum = -main.department_sum.doubleValue();
-                    break;
-            }
-            case "V": if (Objects.equals(main.oper_g, "N"))
-                sum = -main.refunddepart_sum.doubleValue();
-        }
-        return Math.ceil(sum * 100) / 100;
+        double sum = isBasic ? main.department_sum.doubleValue()
+                : isRefuse || isCancel ? -main.department_sum.doubleValue()
+                : isRefund ? -main.refunddepart_sum.doubleValue()
+                : 0;
+
+        return (Math.ceil(sum * 100) / 100);
     }
 
     private Double getLgotP28() {
-        Double sum = (double) 0;
-        switch (main.oper) {
-            case "O": switch (main.oper_g) {
-                case "N":
-                    sum = main.total_sum.doubleValue();
-                    break;
-                case "G":
-                case "O":
-                    sum = -main.refund_sum.doubleValue();
-                    break;
-            }
-            case "V": if (Objects.equals(main.oper_g, "N"))
-                sum = -main.refund_sum.doubleValue();
-        }
-        return Math.ceil(sum * 100) / 100;
+        double sum = isBasic ? main.total_sum.doubleValue()
+                : isRefuse || isCancel ? -main.total_sum.doubleValue()
+                : isRefund ? -main.refund_sum.doubleValue()
+                : 0;
+
+        return (Math.ceil(sum * 100) / 100);
     }
 
     private String getTSite() {
