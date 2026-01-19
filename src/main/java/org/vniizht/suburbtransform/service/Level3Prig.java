@@ -220,7 +220,7 @@ public final class Level3Prig extends Level3 <Level2Dao.PrigCursor> {
                                 .yyyymm(Integer.parseInt(yyyymm))
                                 .p12(yyyymm.substring(2))
 
-                                .p33(Long.valueOf(trips))
+                                .p33(Long.valueOf(trips) * main.pass_qty)
                                 // Стоимости
                                 .p34(isActual ? t1.p34 : 0)
                                 .p35(isActual ? t1.p35 : 0)
@@ -426,8 +426,8 @@ public final class Level3Prig extends Level3 <Level2Dao.PrigCursor> {
 
         char type;
         switch (main.abonement_type.charAt(0)) {
-            case '3': case '5': case '7': type = '0'; // Месячный
-            case '2': case '4': case '6': type = '1'; // Посуточный
+            case '3': case '5': case '7': type = '0'; break; // Месячный
+            case '2': case '4': case '6': type = '1'; break; // Посуточный
             default: type = '4';                      // Количество поездок
         }
         return type + String.format("%02d", main.seatstick_limit);
