@@ -66,7 +66,9 @@ public final class Level3Prig extends Level3 <Level2Dao.PrigCursor> {
     protected T1 getT1() {
         String saleRoad = HandbookDao.getRoad3(main.sale_station, main.operation_date);
         return T1.builder()
-                .request_date(main.request_date)
+                .request_date  (main.request_date)
+                .operation_date(main.operation_date)
+                .ticket_begdate(main.ticket_begdate)
                 .yyyymm(yyyyMM)
                 .p1("tab1")
                 .p3(Util.formatDate(main.operation_date, "yyyy"))

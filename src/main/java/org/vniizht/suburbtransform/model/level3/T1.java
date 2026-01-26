@@ -13,6 +13,8 @@ import java.util.Date;
 public class T1 {
 
     public Date request_date;
+    public Date operation_date;
+    public Date ticket_begdate;
     public Integer yyyymm;
     public String p1;
     public Long p2;
@@ -133,51 +135,55 @@ public class T1 {
     }
 
     public String getKey() {
-        StringBuilder keyBuilder = new StringBuilder();
-        keyBuilder.append(p1);
-        keyBuilder.append(p2);
-        keyBuilder.append(p3);
-        keyBuilder.append(p4);
-        keyBuilder.append(p5);
-        keyBuilder.append(p6);
-        keyBuilder.append(p7);
-        keyBuilder.append(p8);
-        keyBuilder.append(p9);
-        keyBuilder.append(p10);
-        keyBuilder.append(p11);
-        keyBuilder.append(p12);
-        keyBuilder.append(p13);
-        keyBuilder.append(p14);
-        keyBuilder.append(p15);
-        keyBuilder.append(p16);
-        keyBuilder.append(p17);
-        keyBuilder.append(p18);
-        keyBuilder.append(p19);
-        keyBuilder.append(p20);
-        keyBuilder.append(p21);
-        keyBuilder.append(p22);
-        keyBuilder.append(p23);
-        keyBuilder.append(p24);
-        keyBuilder.append(p25);
-        keyBuilder.append(p26);
-        keyBuilder.append(p27);
-        keyBuilder.append(p28);
-        keyBuilder.append(p29);
-        keyBuilder.append(p30);
-        keyBuilder.append(p31);
-        keyBuilder.append(p32);
-        keyBuilder.append(p52);
-        keyBuilder.append(p53);
-        keyBuilder.append(p54);
-        keyBuilder.append(p55);
-        keyBuilder.append(p56);
-        keyBuilder.append(p57);
-        keyBuilder.append(p58);
-        keyBuilder.append(p59);
-        keyBuilder.append(p60);
-        keyBuilder.append(p61);
-        keyBuilder.append(p62);
-        keyBuilder.append(p63);
-        return keyBuilder.toString();
+        return new StringBuilder()
+                .append(request_date)
+                .append(operation_date)
+                .append(ticket_begdate)
+                .append(yyyymm)
+                .append(p1)
+                .append(p2)
+                .append(p3)
+                .append(p4)
+                .append(p5)
+                .append(p6)
+                .append(p7)
+                .append(p8)
+                .append(p9)
+                .append(p10)
+                .append(p11)
+                .append(p12)
+                .append(p13)
+                .append(p14)
+                .append(p15)
+                .append(p16)
+                .append(p17)
+                .append(p18)
+                .append(p19)
+                .append(p20)
+                .append(p21)
+                .append(p22)
+                .append(p23)
+                .append(p24)
+                .append(p25)
+                .append(p26)
+                .append(p27)
+                .append(p28)
+                .append(p29)
+                .append(p30)
+                .append(p31)
+                .append(p32)
+                .append(p52)
+                .append(p53)
+                .append(p54)
+                .append(p55)
+                .append(p56)
+                .append(p57)
+                .append(p58)
+                .append(p59)
+                .append(p60)
+                .append(p61)
+                .append(p62)
+                .append(p63)
+                .toString();
     }
 }

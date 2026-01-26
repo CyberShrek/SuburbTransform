@@ -25,7 +25,10 @@ public class Main {
         }
 
         // Запуск
-        Transformation.run(new TransformationOptions(requestDate,
+        if (argsSet.contains("spec"))
+            Transformation.runSpec();
+        else
+            Transformation.run(new TransformationOptions(requestDate,
                 argsSet.contains("prig"),
                 argsSet.contains("pass")));
     }

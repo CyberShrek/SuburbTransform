@@ -15,7 +15,7 @@ abstract public class Level3 <L2_CURSOR extends Level2Dao.Cursor> {
 
     // Конечные результаты - трансформированные записи второго уровня, готовые к записи в базу данных
     @Getter private final Map<String, CO22> co22Result = new HashMap<>();
-    @Getter private final List<Lgot>        lgotResult = new ArrayList<Lgot>();
+    @Getter private final List<Lgot>        lgotResult = new ArrayList<>();
 
     // Подсчитанное время на сопутствующие операции (с)
     @Getter private float transformationTime   = 0;
@@ -113,8 +113,8 @@ abstract public class Level3 <L2_CURSOR extends Level2Dao.Cursor> {
                 T4 t4 = new T4(requestDate, route,
                         (long) getRegionIncomePerKm(route.getRegion()),
                         (long) getRegionOutcomePerKm(route.getRegion()));
-                if (t4.p7 != 0 || t4.p8 != 0)
-                    this.t4.add(t4);
+//                if (t4.p7 != 0 || t4.p8 != 0)
+                this.t4.add(t4);
             });
             routeGroup.getDcsRoutes().forEach(route         -> t6.add(new T6(requestDate, route)));
             metas.add(getMeta());

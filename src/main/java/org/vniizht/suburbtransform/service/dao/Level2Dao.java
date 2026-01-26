@@ -14,6 +14,10 @@ public class Level2Dao { private Level2Dao() {}
         return findIdnums("level2/findPrigIdnums", requestDate);
     }
 
+    public static List<Long> findPrigSpecIdnums() {
+        return findIdnums("level2/findPrigSpecIdnums", null);
+    }
+
     public static List<Long> findPassIdnums(Date requestDate) {
         return findIdnums("level2/findPassIdnums", requestDate);
     }

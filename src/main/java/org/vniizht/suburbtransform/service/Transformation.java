@@ -19,6 +19,28 @@ public class Transformation { private Transformation() {}
 
     private static final Log log = new Log();
 
+
+    public static synchronized void runSpec() throws Exception {
+        Date startTime = new Date();
+        log.nextTimeLine("Выполняю специальную трансформацию");
+        try {
+            log.nextTimeLine("Получаю справочники...");
+            HandbookDao.loadCache();
+
+            log.nextTimeLine("Начинаю трансформацию...");
+            complete(transformPrigOrNull(Level2Dao::findPrigSpecIdnums));
+
+            Level3Dao.commit();
+            log.nextTimeLine("Конец выполнения.");
+
+        } catch (Exception e) {
+            log.error(e.getLocalizedMessage() == null ? "" : e.getLocalizedMessage());
+            throw e;
+        } finally {
+            log.finish("Итоговое время выполнения: " + (new Date().getTime() - startTime.getTime()) / 1000 + "с");
+        }
+    }
+
     public static synchronized void run(TransformationOptions options) {
 
         Date startTime = new Date();
@@ -77,11 +99,11 @@ public class Transformation { private Transformation() {}
 
             if (options.prig) {
                 log.nextTimeLine("Выполняю трансформацию l2_prig...");
-                complete(transformPrigOrNull(requestDate));
+                complete(transformPrigOrNull(() -> Level2Dao.findPrigIdnums(requestDate)));
             }
             if (options.pass) {
                 log.nextTimeLine("Выполняю трансформацию l2_pass...");
-                complete(transformPassOrNull(requestDate));
+                complete(transformPassOrNull(() -> Level2Dao.findPassIdnums(requestDate)));
             }
             Level3Dao.commit();
             log.nextTimeLine("Конец выполнения.");
@@ -93,19 +115,19 @@ public class Transformation { private Transformation() {}
         }
     }
 
-    private static Level3Prig transformPrigOrNull(java.sql.Date requestDate) {
+    private static Level3Prig transformPrigOrNull(Supplier<List<Long>> idnumsLoader) {
         return (Level3Prig) transformOrNull(
                 "l2_prig",
-                () -> Level2Dao.findPrigIdnums(requestDate),
+                idnumsLoader,
                 Level2Dao::loadPrig,
                 new Level3Prig(Level3Dao.getLatestT1P2() + 1)
         );
     }
 
-    private static Level3Pass transformPassOrNull(java.sql.Date requestDate) {
+    private static Level3Pass transformPassOrNull(Supplier<List<Long>> idnumsLoader) {
         return (Level3Pass) transformOrNull(
                 "l2_prig",
-                () -> Level2Dao.findPassIdnums(requestDate),
+                idnumsLoader,
                 Level2Dao::loadPass,
                 new Level3Pass(Level3Dao.getLatestT1P2() + 1)
         );
