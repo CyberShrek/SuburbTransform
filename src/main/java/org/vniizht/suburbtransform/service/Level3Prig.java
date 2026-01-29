@@ -197,16 +197,16 @@ public final class Level3Prig extends Level3 <Level2Dao.PrigCursor> {
             }
             costsPerRouteNum.get(cost.route_num).add(cost);
         });
-        costsPerRouteNum.forEach((routeNum, costs) -> {
-            PrigCost firstCost = costs.get(0);
-            PrigCost lastCost  = costs.get(costs.size() - 1);
-            routeGroup.merge(RoutesDao.getRouteGroup(
-                    routeNum,
-                    firstCost.departure_station,
-                    lastCost.arrival_station,
-                    firstCost.request_date
-            ));
-        });
+//        costsPerRouteNum.forEach((routeNum, costs) -> {
+//            PrigCost firstCost = costs.get(0);
+//            PrigCost lastCost  = costs.get(costs.size() - 1);
+//            routeGroup.merge(RoutesDao.getRouteGroup(
+//                    routeNum,
+//                    firstCost.departure_station,
+//                    lastCost.arrival_station,
+//                    firstCost.request_date
+//            ));
+//        });
         return routeGroup;
     }
 

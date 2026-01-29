@@ -30,13 +30,6 @@ public class Level2Dao { private Level2Dao() {}
         return new PassCursor(idnums);
     }
 
-//    public static Set<Record> findPassRecords(Date requestDate) {
-//        Map<Long, PassRecord> collector = new LinkedHashMap<>();
-//        List<PassMain> mainList = passMainRepo.findAllByRequestDateAndIdnumIn(requestDate, ids);
-//        mainList.forEach(main -> collector.put(main.idnum, new PassRecord(main)));
-//        return new LinkedHashSet<>(collector.values());
-//    }
-
 
     @ToString(callSuper = true)
     static public class PrigCursor extends Cursor<PrigCursor> {
@@ -108,7 +101,7 @@ public class Level2Dao { private Level2Dao() {}
         @SneakyThrows
         Cursor(String queryId, List<Long> idnums) {
             this.idnums = idnums;
-            this.mainRS = SimpleJdbc.query(queryId, new HashMap(){{
+            mainRS = SimpleJdbc.query(queryId, new HashMap(){{
                 put("idnums", idnums);
             }});
         }
@@ -131,6 +124,13 @@ public class Level2Dao { private Level2Dao() {}
 
         public int size() {
             return idnums.size();
+        }
+
+        @SneakyThrows
+        public void close() {
+            mainRS.close();
+            for (ResultSet rs : childrenRS.values())
+                rs.close();
         }
 
         @SneakyThrows

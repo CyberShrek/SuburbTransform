@@ -64,7 +64,5 @@ VALUES (
         ${p60}::char(3),
         ${p61}::char,
         ${p62}::int,
-        ${p63}::char,
-        ${operation_date}::date,
-        ${ticket_begdate}::date
+        ${p63}::char
 )

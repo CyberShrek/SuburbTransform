@@ -57,6 +57,7 @@ abstract public class Level3 <L2_CURSOR extends Level2Dao.Cursor> {
             transform((L2_CURSOR) cursor.next());
         }
         log.nextLine();
+        cursor.close();
         arrangeResult();
         roundTimes();
     }
