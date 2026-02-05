@@ -277,10 +277,10 @@ public final class Level3Pass extends Level3 <Level2Dao.PassCursor> {
     }
 
     private Double getT1P39() {
-        return costList.stream().mapToDouble(costListItem -> {
-                    switch (costListItem.sum_code.intValue()) {
+        return costList.stream().mapToDouble(cost -> {
+                    switch (cost.sum_code.intValue()) {
                         case 104: case 105: case 106:
-                            return costListItem.sum_nde.doubleValue();
+                            return cost.sum_nde.doubleValue();
                         default: return 0;
                     }}
                 ).sum();
@@ -288,33 +288,33 @@ public final class Level3Pass extends Level3 <Level2Dao.PassCursor> {
 
     private Double getT1P40() {
         return costList.stream().mapToDouble(
-                        costListItem -> costListItem.sum_code.intValue() == 101
-                                ? costListItem.sum_nde.doubleValue()
+                        cost -> cost.sum_code.intValue() == 101
+                                ? cost.sum_nde.doubleValue()
                                 : 0
                 ).sum();
     }
 
     private Double getT1P44() {
-        return costList.stream().mapToDouble(costListItem -> {
-                    switch (costListItem.sum_code.intValue()) {
+        return costList.stream().mapToDouble(cost -> {
+                    switch (cost.sum_code.intValue()) {
                         case 101: case 116: {
-                            switch (main.paymenttype) {
+                            switch (cost.paymenttype) {
                                 case "Б": case "В": case "Ж": case "9":
-                                    return costListItem.sum_nde.doubleValue();
+                                    return cost.sum_nde.doubleValue();
                             }
                         }
                     }
-                    return 0F;
+                    return 0.0;
                 }).sum();
     }
 
     private Double getT1P47() {
-        return costList.stream().mapToDouble(costListItem -> {
-                    switch (costListItem.sum_code.intValue()) {
+        return costList.stream().mapToDouble(cost -> {
+                    switch (cost.sum_code.intValue()) {
                         case 104: case 105: case 106:
-                            switch (main.paymenttype) {
+                            switch (cost.paymenttype) {
                                 case "Б": case "В": case "Ж": case "9":
-                                    return costListItem.sum_nde.doubleValue();
+                                    return cost.sum_nde.doubleValue();
                             }
                     }
                     return 0;
@@ -322,10 +322,10 @@ public final class Level3Pass extends Level3 <Level2Dao.PassCursor> {
     }
 
     private Double getT1P48() {
-        return costList.stream().mapToDouble(costListItem -> {
-                    if (costListItem.sum_code.intValue() == 101) switch (main.paymenttype) {
+        return costList.stream().mapToDouble(cost -> {
+                    if (cost.sum_code.intValue() == 101) switch (cost.paymenttype) {
                         case "Б": case "В": case "Ж": case "9":
-                            return costListItem.sum_nde.doubleValue();
+                            return cost.sum_nde.doubleValue();
                     }
                     return 0;
                 }).sum();
@@ -428,7 +428,7 @@ public final class Level3Pass extends Level3 <Level2Dao.PassCursor> {
                                 case 101:
                                 case 102:
                                 case 116:
-                                    switch (main.paymenttype) {
+                                    switch (cost.paymenttype) {
                                         case "9":
                                         case "Б":
                                             return cost.sum_nde.doubleValue();
@@ -446,7 +446,7 @@ public final class Level3Pass extends Level3 <Level2Dao.PassCursor> {
                                 case 101:
                                 case 102:
                                 case 116:
-                                    switch (main.paymenttype) {
+                                    switch (cost.paymenttype) {
                                         case "1":
                                         case "6":
                                         case "8":
