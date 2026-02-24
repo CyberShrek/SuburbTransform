@@ -19,7 +19,6 @@ public class Transformation { private Transformation() {}
 
     private static final Log log = new Log();
 
-
     public static synchronized void runSpec() {
         Date startTime = new Date();
         log.nextTimeLine("Выполняю специальную трансформацию");
@@ -140,7 +139,7 @@ public class Transformation { private Transformation() {}
         log.nextTimeLine("Загружаю список idnum...");
         List<Long> idnums = idnumsLoader.get();
         log.nextTimeLine("Найдено записей main: " + idnums.size());
-        if (idnums.size() == 0) return null;
+        if (idnums.isEmpty()) return null;
         List<List<Long>> pagedIdnums = Util.splitList(idnums, PORTION_SIZE);
         for (int i = 0; i < pagedIdnums.size(); i++) {
             List<Long> currentIdnums = pagedIdnums.get(i);

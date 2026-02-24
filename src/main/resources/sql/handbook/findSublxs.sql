@@ -5,8 +5,3 @@ SELECT DISTINCT
     datak
 
 FROM prig.sublx
-
---          public Integer code_lg_gvc;
--- public String           lg;
--- public Date          datan;
--- public Date          datak;
