@@ -247,7 +247,7 @@ public final class Level3Pass extends Level3 <Level2Dao.PassCursor> {
 
     private String getT1P22() {
         return main.f_tick.length > 2 && main.f_tick[2] ? "2"                                        // Детский
-                : !main.benefit_code.equals("000") || main.f_tick.length > 4 && main.f_tick[4] ? "3"  // Льготный
+                : !main.benefit_code.equals("000") || main.f_tick.length > 4 && main.f_tick[4] ? "3" // Льготный
                 :  main.f_tick.length > 1 && main.f_tick[1] ? "1"                                    // Полный
                 : "0" ;
     }
@@ -390,7 +390,7 @@ public final class Level3Pass extends Level3 <Level2Dao.PassCursor> {
 
     private String getLgotP13() {
         return lgotGroupIs22
-                ? lgot.employee_unit
+                ? lgot.employee_cat
                 : "0";
     }
 

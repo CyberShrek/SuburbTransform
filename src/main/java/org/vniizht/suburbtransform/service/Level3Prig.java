@@ -146,7 +146,7 @@ public final class Level3Prig extends Level3 <Level2Dao.PrigCursor> {
                 .p3(HandbookDao.getDepartment(main.sale_station, main.operation_date))
                 .p4(getLgotP4())
                 .p5(getLgotP5())
-                .p6(!Objects.equals(main.train_category, "O") ? main.train_category : "0")
+                .p6(Objects.equals(main.train_category, "O") ? "0" : main.train_category)
                 .p7(fullBenefit)
                 .p8(Util.addLeadingZeros(String.valueOf(main.carriage_code), 4))
                 .p9(HandbookDao.getOkatoByRegion(main.benefit_region, main.operation_date))
