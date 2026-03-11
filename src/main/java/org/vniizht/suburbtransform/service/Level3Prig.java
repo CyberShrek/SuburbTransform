@@ -152,7 +152,7 @@ public final class Level3Prig extends Level3 <Level2Dao.PrigCursor> {
                 .p9(HandbookDao.getOkatoByRegion(main.benefit_region, main.operation_date))
                 .p10(adi == null ? null : adi.benefit_doc)
                 .p11(Util.addLeadingZeros(main.benefitgroup_code.equals("22") && adi != null
-                        ? adi.bilgroup_secur + adi.bilgroup_code
+                        ? adi.bilgroup_code + adi.bilgroup_secur
                         : main.benefit_region, 5))
                 .p12(Util.addLeadingZeros(adi == null ? null : adi.employee_unit, 10))
                 .p13(main.benefitgroup_code.equals("22") && adi != null ? adi.employee_cat : "0")
@@ -507,7 +507,7 @@ public final class Level3Prig extends Level3 <Level2Dao.PrigCursor> {
     }
 
     private Boolean getLgotP17() {
-        return main.flg_stickettype[2] || main.abonement_type.charAt(0) != 0;
+        return main.flg_stickettype[2] || main.abonement_type.charAt(0) != '0';
     }
 
     private Integer getLgotP18() {
