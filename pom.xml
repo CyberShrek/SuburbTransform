@@ -7,6 +7,7 @@
     <groupId>org.vniizht</groupId>
     <artifactId>SuburbTransform</artifactId>
     <version>1.0</version>
+
     <packaging>jar</packaging>
 
     <properties>
