@@ -11,7 +11,7 @@ import org.vniizht.suburbtransform.model.routes.RouteGroup;
 import org.vniizht.suburbtransform.service.dao.HandbookDao;
 import org.vniizht.suburbtransform.service.dao.Level2Dao;
 import org.vniizht.suburbtransform.service.dao.RoutesDao;
-import org.vniizht.suburbtransform.service.dao.TripsDao;
+import org.vniizht.suburbtransform.service.misc.AbonementTrips;
 import org.vniizht.suburbtransform.util.Util;
 
 import java.util.*;
@@ -215,7 +215,7 @@ public final class Level3Prig extends Level3 <Level2Dao.PrigCursor> {
         Set<T1> t1Set = new LinkedHashSet<>();
 
         if (isAbonement) {
-            TripsDao.calculateTripsPerMonth(main, isRefund)
+            AbonementTrips.calculateTripsPerMonth(main, isRefund)
                     .forEach((yyyymm, trips) -> {
                         boolean isActual = t1.yyyymm == Integer.parseInt(yyyymm);
                         t1Set.add(t1.toBuilder()

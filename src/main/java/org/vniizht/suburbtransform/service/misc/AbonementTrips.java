@@ -1,14 +1,15 @@
-package org.vniizht.suburbtransform.service.dao;
+package org.vniizht.suburbtransform.service.misc;
 
 import org.vniizht.suburbtransform.model.handbook.SeasonTrip;
 import org.vniizht.suburbtransform.model.level2.PrigMain;
+import org.vniizht.suburbtransform.service.dao.HandbookDao;
 import org.vniizht.suburbtransform.util.Util;
 
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class TripsDao { private TripsDao() {}
+public class AbonementTrips { private AbonementTrips() {}
 
     public static Map<String, Integer> calculateTripsPerMonth(PrigMain main, boolean isRefund) {
         Date startDate = isRefund ? main.operation_date : main.ticket_begdate;
