@@ -49,8 +49,9 @@ public class AbonementTrips { private AbonementTrips() {}
     }
 
     private static Map<String, Byte> calculateDaysWithTripsPerMonth(Date saleDate,
-                                                             Date begDate,
-                                                             Date endDate) {
+                                                                    Date begDate,
+                                                                    Date endDate) {
+
         Map<String, Byte> daysWithTripsPerMonth = new LinkedHashMap<>();
 
         for (Date iterDate = new Date(Math.min(saleDate.getTime(), begDate.getTime()));
