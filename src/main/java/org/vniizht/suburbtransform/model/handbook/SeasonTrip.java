@@ -1,14 +1,16 @@
 package org.vniizht.suburbtransform.model.handbook;
 
+import lombok.Getter;
 import lombok.ToString;
 
 import java.util.Date;
 
 @ToString
+@Getter
 public class SeasonTrip {
 
     public Integer trip_code_id;
-    public String gos;
+    public String  gos;
     public Integer season_tick_code;
     public Integer period;
     public Integer kol_trips;
