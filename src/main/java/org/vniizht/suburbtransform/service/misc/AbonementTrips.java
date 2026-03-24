@@ -5,7 +5,6 @@ import org.vniizht.suburbtransform.model.level2.PrigMain;
 import org.vniizht.suburbtransform.service.dao.HandbookDao;
 import org.vniizht.suburbtransform.util.Util;
 
-import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -17,9 +16,10 @@ public class AbonementTrips { private AbonementTrips() {}
     public static Map<String, Integer> calculateTripsPerMonth(PrigMain main, boolean isRefund) {
         Date startDate = isRefund ? main.operation_date : main.ticket_begdate;
 
+        int ticketCode = abonementType2ticketCode(main.abonement_subtype, main.abonement_type);
         return calculateTripsPerMonth(
                 HandbookDao.cache.findTrip(
-                        abonementType2ticketCode(main.abonement_subtype, main.abonement_type),
+                        ticketCode,
                         main.seatstick_limit,
                         startDate),
                 new Date(Math.min(main.operation_date.getTime(), startDate.getTime())),
@@ -44,7 +44,7 @@ public class AbonementTrips { private AbonementTrips() {}
         int tripsPerMonth = (Optional.ofNullable(seasonTrip.getKol__round_trips()).orElse(0) / 2) * (isRefund ? -1 : 1);
 
         if (begYyyymm.equals(endYyyymm)) {
-            totalTripsPerMonth.put(begYyyymm, calculateTripsCount(endDays - begDays + 1, tripsPerMonth));
+            totalTripsPerMonth.put(begYyyymm, tripsPerMonth);
         } else {
             int endTripsCount = calculateTripsCount(endDays, tripsPerMonth);
             totalTripsPerMonth.put(begYyyymm, tripsPerMonth - endTripsCount);
@@ -63,43 +63,11 @@ public class AbonementTrips { private AbonementTrips() {}
             totalTripsPerMonth.put(endYyyymm, endTripsCount);
         }
 
-
-
-//        calculateDaysWithTripsPerMonth(begDate, endDate)
-//                .forEach((yyyymm, daysWithTrips) -> {
-//                    int trips = seasonTrip == null ? 0 :
-//                            Math.round(((float) seasonTrip.getKol__round_trips() / 2)
-//                                    * ((float) daysWithTrips / 30));
-//
-//                    if(trips == 0 && Util.formatDate(begDate, "yyyyMM").equals(yyyymm))
-//                        trips = 1;
-//
-//                    totalTripsPerMonth.put(yyyymm, trips * (isRefund ? -1 : 1));
-//                });
-
         return totalTripsPerMonth;
     }
 
     private static int calculateTripsCount(int activeDays, int tripsPerMonth) {
         return (int) (tripsPerMonth * ((float) activeDays / 31));
-    }
-
-    private static Map<String, Byte> calculateDaysWithTripsPerMonth(Date begDate,
-                                                                    Date endDate) {
-
-        Map<String, Byte> daysWithTripsPerMonth = new LinkedHashMap<>();
-
-        for (Date iterDate = begDate;
-             iterDate.before(endDate) || iterDate.equals(endDate);
-             iterDate = new Date(iterDate.getTime() + 86400000)) {
-
-            byte daysWithTrips = daysWithTripsPerMonth.computeIfAbsent(yyyymm(iterDate), k -> (byte) 0);
-            if (iterDate.getTime() >= begDate.getTime())
-                daysWithTrips++;
-
-            daysWithTripsPerMonth.put(yyyymm(iterDate), daysWithTrips);
-        }
-        return daysWithTripsPerMonth;
     }
 
     private static Integer abonementType2ticketCode(String abonementSubtype, String abonementType) {

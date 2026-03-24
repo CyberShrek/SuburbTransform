@@ -58,7 +58,7 @@ public final class Level3Prig extends Level3 <Level2Dao.PrigCursor> {
     @Override
     protected boolean lgotExists() {
         return t1Exists()
-                && !main.benefit_code.equals("00")
+                && !main.benefit_code     .equals("00")
                 && !main.benefitgroup_code.equals("21");
     }
 

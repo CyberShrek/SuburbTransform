@@ -78,6 +78,29 @@ class AbonementTripsTest {
                 }});
     }
 
+    @Test
+    void testTripsCase5() {
+        assertThat(tripsFor(12,
+                LocalDate.of(2025, 3, 12),
+                LocalDate.of(2025, 4, 11),
+                false))
+                .isEqualTo(new HashMap<String, Integer>() {{
+                    put("202503", 4);
+                    put("202504", 2);
+                }});
+    }
+
+    @Test
+    void testTripsCase6() {
+        assertThat(tripsFor(16,
+                LocalDate.of(2025, 3, 10),
+                LocalDate.of(2025, 3, 19),
+                false))
+                .isEqualTo(new HashMap<String, Integer>() {{
+                    put("202503", 8);
+                }});
+    }
+
 
     @Mock
     SeasonTrip seasonTrip;
