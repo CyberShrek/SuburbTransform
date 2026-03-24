@@ -10,6 +10,7 @@ import java.time.ZoneId;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class AbonementTrips { private AbonementTrips() {}
 
@@ -40,7 +41,7 @@ public class AbonementTrips { private AbonementTrips() {}
         int begDays = begDate.getDate();
         int endDays = endDate.getDate();
 
-        int tripsPerMonth = (seasonTrip.getKol__round_trips() / 2) * (isRefund ? -1 : 1);
+        int tripsPerMonth = (Optional.ofNullable(seasonTrip.getKol__round_trips()).orElse(0) / 2) * (isRefund ? -1 : 1);
 
         if (begYyyymm.equals(endYyyymm)) {
             totalTripsPerMonth.put(begYyyymm, calculateTripsCount(endDays - begDays + 1, tripsPerMonth));
