@@ -112,8 +112,8 @@ abstract public class Level3 <L2_CURSOR extends Level2Dao.Cursor> {
             routeGroup.getRegionRoutes().forEach(route      -> t3.add(new T3(requestDate, route)));
             routeGroup.getFollowRoutes().forEach(route      -> {
                 T4 t4 = new T4(requestDate, route,
-                        (long) getRegionIncomePerKm(route.getRegion()),
-                        (long) getRegionOutcomePerKm(route.getRegion()));
+                        getRegionIncomePerKm(route.getRegion()),
+                        getRegionOutcomePerKm(route.getRegion()));
 //                if (t4.p7 != 0 || t4.p8 != 0)
                 this.t4.add(t4);
             });
@@ -137,12 +137,12 @@ abstract public class Level3 <L2_CURSOR extends Level2Dao.Cursor> {
         }
 
         void arrangeCosts() {arrangeCosts(false);}
-        void arrangeCosts(boolean edgeOnly) {
+        void arrangeCosts(boolean firstOnly) {
             if (t4.isEmpty()) return;
             double incomeDelta  = t1.p36 - t4.stream().mapToDouble(t4 -> t4.p7).sum();
             double outcomeDelta = t1.p44 - t4.stream().mapToDouble(t4 -> t4.p8).sum();
 
-            if(edgeOnly || t1.p21.equals("6")) {
+            if(firstOnly || t1.p21.equals("6")) {
                 // Добавление разницы в первую запись
                 T4 firstT4 = t4.get(0);
                 firstT4.p7 = firstT4.p7 + incomeDelta;

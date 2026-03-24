@@ -37,9 +37,9 @@ public final class Level3Prig extends Level3 <Level2Dao.PrigCursor> {
 
     @Override
     protected void next(Level2Dao.PrigCursor cursor) {
-        main     = cursor.getMain();
-        costList = cursor.getCost();
-        adi      = cursor.getAdi();
+        main        = cursor.getMain();
+        costList    = cursor.getCost();
+        adi         = cursor.getAdi();
         isAbonement = getT1P21().equals("5");
         fullBenefit = main.benefitgroup_code + main.benefit_code;
         yyyyMM = Integer.parseInt(Util.formatDate(main.operation_date, "yyyyMM"));
