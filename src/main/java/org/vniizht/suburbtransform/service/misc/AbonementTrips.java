@@ -38,15 +38,12 @@ public class AbonementTrips { private AbonementTrips() {}
         String begYyyymm = yyyymm(begDate);
         String endYyyymm = yyyymm(endDate);
 
-        int begDays = begDate.getDate();
-        int endDays = endDate.getDate();
-
         int tripsPerMonth = (Optional.ofNullable(seasonTrip.getKol__round_trips()).orElse(0) / 2) * (isRefund ? -1 : 1);
 
         if (begYyyymm.equals(endYyyymm)) {
             totalTripsPerMonth.put(begYyyymm, tripsPerMonth);
         } else {
-            int endTripsCount = calculateTripsCount(endDays, tripsPerMonth);
+            int endTripsCount = calculateTripsCount(endDate.getDate(), tripsPerMonth);
             totalTripsPerMonth.put(begYyyymm, tripsPerMonth - endTripsCount);
 
             Date iterDate = begDate;
@@ -67,7 +64,7 @@ public class AbonementTrips { private AbonementTrips() {}
     }
 
     private static int calculateTripsCount(int activeDays, int tripsPerMonth) {
-        return (int) (tripsPerMonth * ((float) activeDays / 31));
+        return (int) (tripsPerMonth * ((float) activeDays / 30));
     }
 
     private static Integer abonementType2ticketCode(String abonementSubtype, String abonementType) {
