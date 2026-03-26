@@ -241,6 +241,7 @@ public final class Level3Prig extends Level3 <Level2Dao.PrigCursor> {
                                 .p48(isActual ? t1.p48 : 0)
                                 .p49(isActual ? t1.p49 : 0)
                                 .p50(isActual ? t1.p50 : 0)
+                                .p51(isActual ? t1.p51 : 0)
                                 .build());
                     });
         } else {
