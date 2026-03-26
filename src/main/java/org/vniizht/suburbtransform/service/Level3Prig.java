@@ -384,6 +384,7 @@ public final class Level3Prig extends Level3 <Level2Dao.PrigCursor> {
     }
 
     private Long getT1P51() {
+        if (getT1P36() + getT1P44() == 0) return 0L;
         return (long) (isRefund || isRefuse || isCancel
                 ? -main.pass_qty
                 : main.pass_qty);

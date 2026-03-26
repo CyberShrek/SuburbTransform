@@ -157,7 +157,7 @@ public final class Level3Pass extends Level3 <Level2Dao.PassCursor> {
                 .p12(getLgotP12())
                 .p13(getLgotP13())
                 .p14(getLgotP14())
-                .p16(getLgotP16())
+                .p16(main.persons_qty)
                 .p17(Objects.equals(main.trip_direction, "3"))
                 .p18(0)
                 .p20(" ")
@@ -408,16 +408,6 @@ public final class Level3Pass extends Level3 <Level2Dao.PassCursor> {
         else
             return lastName + ' '
                     + (firstName.isEmpty() ? "" : firstName.substring(0, firstName.length() < 2 ? 1 : 2));
-    }
-
-    private int getLgotP16() {
-        if (Objects.equals(noUse, "2")) {
-            if (Objects.equals(main.oper, "O") && (Objects.equals(main.oper_g, "G") || Objects.equals(main.oper_g, "O")))
-                return -1;
-            if (Objects.equals(main.oper, "V") && Objects.equals(main.oper_g, "N"))
-                return -1;
-        }
-        return 1;
     }
 
     private Double getLgotP27() {
